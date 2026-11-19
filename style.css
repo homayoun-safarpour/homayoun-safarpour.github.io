@@ -134,6 +134,21 @@ h1 em{color:var(--green);font-weight:400}
 .twin ul{margin:0;padding-left:1.1rem;font-size:.87rem;color:var(--muted)}
 .twin li+li{margin-top:.2rem}
 @media(max-width:770px){.twin-top{grid-template-columns:1fr;gap:1rem}.twin-lists{grid-template-columns:1fr}}
+.paths{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;padding-bottom:56px}
+.paths a{display:block;text-decoration:none;padding:.85rem 1rem;background:var(--card);border:1px solid var(--hair);border-radius:7px}
+.paths a:hover{border-color:#83998b}
+.paths-who{display:block;font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--green);font-weight:700;margin-bottom:.25rem}
+.paths-go{display:block;font-size:.92rem;font-weight:650}
+.twin-numbers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin:0 0 1rem}
+.twin-numbers div{border-top:2px solid var(--green);padding-top:.55rem}
+.twin-numbers dt{font-family:var(--serif);font-size:clamp(1.7rem,2.8vw,2.3rem);line-height:1;letter-spacing:-.03em;color:var(--green)}
+.twin-numbers dd{margin:.3rem 0 0;font-size:.82rem;color:var(--muted)}
+.twin-steps{list-style:none;counter-reset:step;margin:0 0 1.1rem;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem}
+.twin-steps li{counter-increment:step;background:#edf0e8;border-radius:5px;padding:.6rem .75rem;font-size:.85rem;color:var(--muted)}
+.twin-steps li::before{content:"0" counter(step);display:block;font-family:var(--mono);font-size:.72rem;letter-spacing:.07em;color:var(--green);margin-bottom:.15rem}
+.twin-steps strong{color:var(--ink)}
+.twin-trust{margin:1rem 0 0;padding-top:.8rem;border-top:1px solid var(--hair);font-size:.86rem;color:var(--muted)}
+@media(max-width:770px){.paths,.twin-numbers,.twin-steps{grid-template-columns:1fr}.paths{padding-bottom:40px}}
 .work{border-top:1px solid var(--hair);padding-block:61px 80px}
 .work h2,.workflow h2{font-size:clamp(2.4rem,4.4vw,4rem);margin-bottom:1.35rem}
 .filters{display:flex;align-items:end;justify-content:space-between;gap:.65rem 1rem;flex-wrap:wrap}
