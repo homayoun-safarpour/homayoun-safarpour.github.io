@@ -60,7 +60,7 @@ if (demo) {
     fill.style.width = "0%";
     pick("verdict-strip").classList.add("arrive");
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      fill.style.transition = "width .9s ease-out";
+      fill.style.transition = "width .9s cubic-bezier(.23,1,.32,1)";
       fill.style.width = target;
       setTimeout(() => { fill.style.transition = ""; }, 1000);
     }));
@@ -95,10 +95,10 @@ function filterProjects(animate) {
       const now = card.getBoundingClientRect();
       const was = before.get(card);
       if (!was) {
-        card.animate([{ opacity: 0, transform: "scale(.97)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "ease-out" });
+        card.animate([{ opacity: 0, transform: "scale(.97)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "cubic-bezier(.23,1,.32,1)" });
       } else if (was.left !== now.left || was.top !== now.top) {
         card.animate([{ transform: "translate(" + (was.left - now.left) + "px," + (was.top - now.top) + "px)" }, { transform: "none" }],
-          { duration: 260, easing: "ease-out" });
+          { duration: 260, easing: "cubic-bezier(.77,0,.175,1)" });
       }
     });
   }
@@ -261,5 +261,102 @@ if (canWatch && !reduce.matches) {
     if (section.getBoundingClientRect().top < window.innerHeight * 0.9) return;   // already on screen: leave it alone
     section.classList.add("reveal");
     sectionWatch.observe(section);
+  });
+}
+
+const net = pick("net");
+if (net && net.getContext) {
+  const ctx = net.getContext("2d");
+  const hero = net.parentElement;
+  let points = [];
+  let wide = 0;
+  let high = 0;
+  let frame = 0;
+  let running = false;
+  let pointer = null;
+  let aim = null;
+  const size = () => {
+    const box = hero.getBoundingClientRect();
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    wide = box.width;
+    high = box.height;
+    net.width = Math.round(wide * ratio);
+    net.height = Math.round(high * ratio);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    const count = Math.max(18, Math.min(80, Math.round((wide * high) / 14000)));
+    points = Array.from({ length: count }, () => ({
+      x: Math.random() * wide,
+      y: Math.random() * high,
+      vx: (Math.random() - 0.5) * 0.22,
+      vy: (Math.random() - 0.5) * 0.22,
+    }));
+  };
+  const line = (a, b, colour) => {
+    ctx.strokeStyle = colour;
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  };
+  const draw = () => {
+    ctx.clearRect(0, 0, wide, high);
+    ctx.lineWidth = 1;
+    if (aim) {
+      pointer = pointer ? { x: pointer.x + (aim.x - pointer.x) * 0.12, y: pointer.y + (aim.y - pointer.y) * 0.12 } : { ...aim };
+    } else {
+      pointer = null;
+    }
+    for (const p of points) {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0 || p.x > wide) p.vx *= -1;
+      if (p.y < 0 || p.y > high) p.vy *= -1;
+    }
+    for (let i = 0; i < points.length; i += 1) {
+      const a = points[i];
+      for (let j = i + 1; j < points.length; j += 1) {
+        const b = points[j];
+        const gap = Math.hypot(a.x - b.x, a.y - b.y);
+        if (gap < 150) line(a, b, "rgba(23,78,61," + (0.17 * (1 - gap / 150)).toFixed(3) + ")");
+      }
+      if (pointer) {
+        const gap = Math.hypot(a.x - pointer.x, a.y - pointer.y);
+        if (gap < 190) line(a, pointer, "rgba(173,116,13," + (0.4 * (1 - gap / 190)).toFixed(3) + ")");
+      }
+      ctx.fillStyle = "rgba(23,78,61,.38)";
+      ctx.beginPath();
+      ctx.arc(a.x, a.y, 1.7, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  };
+  const loop = () => {
+    draw();
+    frame = requestAnimationFrame(loop);
+  };
+  const start = () => {
+    if (running || reduce.matches) return;
+    running = true;
+    frame = requestAnimationFrame(loop);
+  };
+  const stop = () => {
+    running = false;
+    cancelAnimationFrame(frame);
+  };
+  size();
+  draw();
+  if (!reduce.matches) {
+    start();
+    if (canWatch) new IntersectionObserver((entries) => (entries[0].isIntersecting ? start() : stop())).observe(hero);
+    document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+    hero.addEventListener("pointermove", (event) => {
+      const box = hero.getBoundingClientRect();
+      aim = { x: event.clientX - box.left, y: event.clientY - box.top };
+    });
+    hero.addEventListener("pointerleave", () => { aim = null; });
+  }
+  let resizeTimer = 0;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { size(); draw(); }, 150);
   });
 }
