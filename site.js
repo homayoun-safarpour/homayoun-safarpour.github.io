@@ -123,39 +123,63 @@ filterProjects();
 pick("project-filters").hidden = false;
 
 const audit = window.AI_USE_AUDIT;
+const FAULTS = ["fault-refund", "fault-cutoff", "fault-handoff", "fault-judges", "fault-jailbreak"];
 const auditClass = (word) => (word === "PASS" ? "good" : word === "FAIL" ? "hold" : "unknown");
-const gateClass = (word) => (word === "PASS" ? "pass" : word === "FAIL" ? "fail" : "error");
+const gateClass = (word) => (word === "PASS" ? "pass" : word === "FAIL" ? "fail" : word === "MISSING" ? "missing" : "error");
 const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+const openNotes = new Set();
 let auditTimers = [];
 
-function auditItem(step) {
-  const item = document.createElement("li");
-  const verdict = document.createElement("span");
-  const body = document.createElement("div");
-  const question = document.createElement("p");
-  const said = document.createElement("p");
-  const tool = document.createElement("span");
-  verdict.className = "audit-verdict " + auditClass(step.verdict);
-  verdict.textContent = step.verdict;
-  question.className = "audit-question";
-  question.textContent = step.question;
-  if (step.optional) {
-    const optional = document.createElement("span");
-    optional.className = "audit-optional";
-    optional.textContent = "optional";
-    question.append(" ", optional);
-  }
-  said.className = "audit-said";
-  tool.className = "audit-tool";
-  tool.textContent = step.tool;
-  said.append(tool, " " + step.evidence_line);
-  body.append(question, said);
-  item.append(verdict, body);
+function make(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function gateCard(gate, step, index) {
+  const item = make("li");
+  item.dataset.gate = String(index + 1);
+  const head = make("div", "gc-head");
+  const body = make("div");
+  const title = make("p", "gc-title");
+  title.append(make("span", "gc-n", String(index + 1)), make("span", "", gate.name), make("span", "gc-tool", gate.tool));
+  if (gate.optional) title.append(make("span", "audit-optional", "optional"));
+  body.append(title, make("p", "audit-question", gate.question), make("p", "audit-said", step.said));
+  head.append(make("span", "audit-verdict " + auditClass(step.verdict), step.verdict), body);
+  const more = make("details", "gc-more");
+  more.open = openNotes.has(index);
+  more.addEventListener("toggle", () => (more.open ? openNotes.add(index) : openNotes.delete(index)));
+  const list = make("dl");
+  const row = (label, value) => {
+    const dd = make("dd");
+    if (typeof value === "string") dd.textContent = value; else dd.append(value);
+    list.append(make("dt", "", label), dd);
+  };
+  row("Checks", gate.checks);
+  row("PASS means", gate.pass);
+  row("PASS does not prove", gate.not);
+  row("Fails when", gate.fails);
+  row("Related to", gate.related);
+  if (step.output.length) row("The tool said", make("pre", "gc-out", step.output.join("\n")));
+  const files = Object.entries(step.files);
+  row("Evidence read", files.length ? files.map(([name, sha]) => name + " sha256 " + sha).join(", ") : step.said);
+  more.append(make("summary", "", "What this gate means"), list);
+  item.append(head, more);
   return item;
 }
 
-function showAudit(animate, quiet) {
-  const key = ["fault-refund", "fault-judges", "fault-handoff"].map((id) => (pick(id).checked ? "1" : "0")).join("");
+function runRows(combo) {
+  const who = { user: "Customer", assistant: "Agent", tool: "Tool" };
+  return combo.run.map((s) => {
+    const item = make("li", s.fault ? "run-fault" : "");
+    item.append(make("span", "run-who", who[s.role] || s.role), make("span", "run-text", s.tool ? s.tool + "(" + s.text + ")" : s.text));
+    return item;
+  });
+}
+
+function showAudit(animate) {
+  const key = FAULTS.map((id) => (pick(id).checked ? "1" : "0")).join("");
   const run = audit.combinations[key];
   if (!run) return;
   auditTimers.forEach(clearTimeout);
@@ -163,7 +187,7 @@ function showAudit(animate, quiet) {
   const svg = pick("audit-gates");
   const gates = [...svg.querySelectorAll(".gate")];
   const token = pick("audit-token");
-  const items = run.steps.map(auditItem);
+  const items = run.steps.map((step, index) => gateCard(audit.gates[index], step, index));
   const place = (point) => token.setAttribute("transform", "translate(" + point.replace(",", " ") + ")");
   const reveal = (index) => {
     const step = run.steps[index];
@@ -176,16 +200,19 @@ function showAudit(animate, quiet) {
     }
   };
   const finish = () => {
+    svg.classList.remove("running");
     place(svg.dataset.end);
     token.setAttribute("class", "token " + auditClass(run.overall));
     pick("audit-overall").className = "verdict " + auditClass(run.overall);
     pick("audit-overall-word").textContent = "Overall: " + run.overall;
     pick("audit-exit").textContent = "exit " + run.exit_code;
     const passed = run.steps.filter((step) => step.verdict === "PASS").length;
-    const caught = run.steps.filter((step) => step.verdict !== "PASS").map((step) => step.id.replace(/^[0-9a-z]+-/, "") + " " + step.verdict);
+    const caught = run.steps.map((step, index) => (step.verdict === "PASS" ? "" : "gate " + (index + 1) + " " + step.verdict)).filter(Boolean);
     pick("audit-status").textContent = "Overall: " + run.overall + ". " + passed + " of " + run.steps.length + " gates passed" +
-      (caught.length ? ". Caught at: " + caught.join(", ") + "." : ".");
+      (caught.length ? ". Caught at " + caught.join(", ") + "." : ".");
   };
+  pick("audit-run-steps").replaceChildren(...runRows(run));
+  pick("audit-run-meta").textContent = "support-4412 · synthetic · trace sha256 " + run.trace_sha;
   pick("audit-steps").replaceChildren(...items);
   if (!animate || calm.matches) {
     run.steps.forEach((step, index) => reveal(index));
@@ -198,6 +225,7 @@ function showAudit(animate, quiet) {
   });
   items.forEach((item) => item.classList.add("pending"));
   token.setAttribute("class", "token");
+  svg.classList.add("running");
   pick("audit-overall").className = "verdict unknown";
   pick("audit-overall-word").textContent = "Running the gates";
   pick("audit-exit").textContent = "";
@@ -214,15 +242,15 @@ function showAudit(animate, quiet) {
 }
 
 if (audit) {
-  ["fault-refund", "fault-judges", "fault-handoff"].forEach((id) => pick(id).addEventListener("change", () => showAudit(true)));
+  FAULTS.forEach((id) => pick(id).addEventListener("change", () => showAudit(true)));
   pick("audit-replay").addEventListener("click", () => showAudit(true));
   pick("audit-options").hidden = false;
   showAudit(false);
   if (canWatch && !reduce.matches) {
-    const boxes = ["fault-refund", "fault-judges", "fault-handoff"].map((id) => pick(id));
+    const boxes = FAULTS.map((id) => pick(id));
     const autoButton = pick("audit-auto");
     const status = pick("audit-status");
-    const tour = ["000", "100", "000", "010", "000", "001"];
+    const tour = ["00000", "10000", "01000", "00100", "00010", "00001"];
     const MOST = tour.length * 3;
     let on = true, seen = false, timer = 0, at = 0, shown = 0;
     const label = () => {
@@ -236,14 +264,15 @@ if (audit) {
       if (shown >= MOST) { on = false; label(); return; }
       const key = tour[at % tour.length];
       boxes.forEach((box, index) => { box.checked = key[index] === "1"; });
-      showAudit(true, true);
+      showAudit(true);
       at += 1;
       shown += 1;
-      timer = setTimeout(next, 6800);
+      timer = setTimeout(next, 7600);
     };
     const takeOver = () => { if (on) { on = false; clearTimeout(timer); label(); } };
     boxes.forEach((box) => box.addEventListener("click", takeOver));
     pick("audit-replay").addEventListener("click", takeOver);
+    pick("audit-steps").addEventListener("click", (event) => { if (event.target.closest("summary")) takeOver(); });
     autoButton.addEventListener("click", () => {
       on = !on;
       shown = 0;
@@ -460,8 +489,8 @@ if (twinCard) {
     document.body.style.backgroundColor = "rgb(" + mix(248, 236, shift) + "," + mix(247, 226, shift) + "," + mix(242, 208, shift) + ")";
     const top = box.top + window.scrollY - high / 2;
     const part = Math.min(1, Math.max(0, window.scrollY / Math.max(1, top)));
-    const letters = Math.round(part * TO.length);
-    word.textContent = TO.slice(0, letters) + FROM.slice(letters);
+    const typed = Math.round(part * (FROM.length + TO.length));
+    word.textContent = typed <= FROM.length ? FROM.slice(0, FROM.length - typed) : TO.slice(0, typed - FROM.length);
     word.classList.toggle("virtual", shift > 0.55);
   };
   window.addEventListener("scroll", story, { passive: true });

@@ -90,7 +90,10 @@ export function start(hero, onReady) {
     aimX = (event.clientX / window.innerWidth - 0.5) * 0.5;
     aimY = (event.clientY / window.innerHeight - 0.5) * 0.3;
   }, { passive: true });
+  let lastDraw = 0, lastMove = performance.now();
   const render = (now) => {
+    if (now - lastDraw < 32) { frame = requestAnimationFrame(render); return; }
+    lastDraw = now;
     const t = (now - began) / 1000;
     tiltX += (aimY - tiltX) * 0.05;
     tiltY += (aimX - tiltY) * 0.05;
@@ -104,11 +107,15 @@ export function start(hero, onReady) {
     pointMaterial.opacity = 0.48 + shift * 0.4;
     canvas.style.opacity = String(Math.max(1 - scrolled * 0.7, shift * 0.95).toFixed(3));
     renderer.render(scene, camera);
+    if (scrolled >= 1 && shift < 0.02 && now - lastMove > 4000) { running = false; return; }
     frame = requestAnimationFrame(render);
   };
   const play = () => { if (!running) { running = true; frame = requestAnimationFrame(render); } };
   const pause = () => { running = false; cancelAnimationFrame(frame); };
   document.addEventListener("visibilitychange", () => (document.hidden ? pause() : play()));
+  const wake = () => { lastMove = performance.now(); if (!document.hidden) play(); };
+  window.addEventListener("scroll", wake, { passive: true });
+  window.addEventListener("pointermove", wake, { passive: true });
   let timer = 0;
   window.addEventListener("resize", () => { clearTimeout(timer); timer = setTimeout(resize, 150); });
   renderer.render(scene, camera);
