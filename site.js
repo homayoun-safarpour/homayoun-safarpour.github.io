@@ -275,6 +275,7 @@ if (net && net.getContext) {
   let running = false;
   let pointer = null;
   let aim = null;
+  let retired = false;
   const size = () => {
     const box = hero.getBoundingClientRect();
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -334,7 +335,7 @@ if (net && net.getContext) {
     frame = requestAnimationFrame(loop);
   };
   const start = () => {
-    if (running || reduce.matches) return;
+    if (running || reduce.matches || retired) return;
     running = true;
     frame = requestAnimationFrame(loop);
   };
@@ -357,6 +358,53 @@ if (net && net.getContext) {
   let resizeTimer = 0;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => { size(); draw(); }, 150);
+    resizeTimer = setTimeout(() => { if (!retired) { size(); draw(); } }, 150);
   });
+
+  const webgl = (() => {
+    try { const test = document.createElement("canvas"); return !!(test.getContext("webgl2") || test.getContext("webgl")); }
+    catch (error) { return false; }
+  })();
+  if (webgl && !reduce.matches && window.innerWidth > 640) {
+    const later = window.requestIdleCallback || ((fn) => setTimeout(fn, 600));
+    window.addEventListener("load", () => later(() => {
+      import("./net3d.js").then((mod) => mod.start(hero, () => {
+        retired = true;
+        stop();
+        net.classList.add("off");
+      })).catch(() => { /* the 2D network simply stays */ });
+    }));
+  }
+}
+
+const bar = pick("progress");
+if (bar) {
+  const update = () => {
+    const room = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.transform = "scaleX(" + (room > 0 ? Math.min(1, window.scrollY / room) : 0).toFixed(4) + ")";
+  };
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
+  update();
+}
+
+if (!reduce.matches && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+  const tilt = (selector, most) => {
+    document.querySelectorAll(selector).forEach((el) => {
+      el.addEventListener("pointermove", (event) => {
+        const box = el.getBoundingClientRect();
+        const x = (event.clientX - box.left) / box.width - 0.5;
+        const y = (event.clientY - box.top) / box.height - 0.5;
+        el.style.transition = "transform 160ms cubic-bezier(.23,1,.32,1)";
+        el.style.transform = "perspective(900px) rotateX(" + (-y * most).toFixed(2) + "deg) rotateY(" + (x * most).toFixed(2) + "deg)";
+      });
+      el.addEventListener("pointerleave", () => {
+        el.style.transition = "transform 420ms cubic-bezier(.23,1,.32,1)";
+        el.style.transform = "";
+      });
+    });
+  };
+  tilt(".demo", 3);
+  tilt(".twin figure", 6);
+  tilt(".facts article", 5);
 }

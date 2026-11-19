@@ -147,6 +147,11 @@ h1 em{color:var(--green);font-weight:400}
 .hero{position:relative}
 .net{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 .hero>.intro,.hero>.demo{position:relative;z-index:1}
+.net3d{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .9s var(--ease-out)}
+.net3d.on{opacity:1}
+.net{transition:opacity .6s var(--ease-out)}.net.off{opacity:0}
+.progress{position:fixed;top:0;left:0;right:0;height:2px;background:var(--green);transform:scaleX(0);transform-origin:0 50%;z-index:5;pointer-events:none}
+.demo,.twin figure,.facts article{will-change:transform}
 .primary,.chips button,.cases span,.replay,.switch-track,.paths a,.github{transition:transform 160ms var(--ease-out),background-color .15s,color .15s,border-color .15s}
 .primary:active,.chips button:active,.replay:active,.github:active{transform:scale(.97)}
 .cases label:active span,.switch:active .switch-track{transform:scale(.97)}
