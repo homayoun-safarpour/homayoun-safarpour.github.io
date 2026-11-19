@@ -170,6 +170,10 @@ function showAudit(animate, quiet) {
     gates[index].setAttribute("class", "gate " + gateClass(step.verdict));
     gates[index].querySelector(".gate-word").textContent = step.verdict;
     items[index].classList.remove("pending");
+    if (animate && !calm.matches) {
+      gates[index].classList.add(step.verdict === "PASS" ? "hit" : "shake");
+      items[index].classList.add("flash");
+    }
   };
   const finish = () => {
     place(svg.dataset.end);
@@ -197,7 +201,7 @@ function showAudit(animate, quiet) {
   pick("audit-overall").className = "verdict unknown";
   pick("audit-overall-word").textContent = "Running the gates";
   pick("audit-exit").textContent = "";
-  if (!quiet) pick("audit-status").textContent = "Running the gates.";
+  pick("audit-status").textContent = "Running the gates.";
   token.classList.add("jump");
   place(svg.dataset.start);
   auditTimers.push(setTimeout(() => token.classList.remove("jump"), 60));
@@ -215,16 +219,44 @@ if (audit) {
   pick("audit-options").hidden = false;
   showAudit(false);
   if (canWatch && !reduce.matches) {
-    let played = false;
-    const stopFirstPlay = () => { played = true; };
-    ["fault-refund", "fault-judges", "fault-handoff", "audit-replay"].forEach((id) => pick(id).addEventListener("click", stopFirstPlay));
-    const gateWatch = new IntersectionObserver((entries) => {
-      if (played || !entries.some((entry) => entry.isIntersecting)) return;
-      played = true;
-      gateWatch.disconnect();
+    const boxes = ["fault-refund", "fault-judges", "fault-handoff"].map((id) => pick(id));
+    const autoButton = pick("audit-auto");
+    const status = pick("audit-status");
+    const tour = ["000", "100", "000", "010", "000", "001"];
+    const MOST = tour.length * 3;
+    let on = true, seen = false, timer = 0, at = 0, shown = 0;
+    const label = () => {
+      autoButton.textContent = "Auto demo: " + (on ? "on" : "off");
+      autoButton.setAttribute("aria-pressed", String(on));
+      status.setAttribute("aria-live", on ? "off" : "polite");
+    };
+    const next = () => {
+      clearTimeout(timer);
+      if (!on || !seen || document.hidden) return;
+      if (shown >= MOST) { on = false; label(); return; }
+      const key = tour[at % tour.length];
+      boxes.forEach((box, index) => { box.checked = key[index] === "1"; });
       showAudit(true, true);
-    }, { threshold: 0.6 });
-    gateWatch.observe(pick("audit-gates"));
+      at += 1;
+      shown += 1;
+      timer = setTimeout(next, 6800);
+    };
+    const takeOver = () => { if (on) { on = false; clearTimeout(timer); label(); } };
+    boxes.forEach((box) => box.addEventListener("click", takeOver));
+    pick("audit-replay").addEventListener("click", takeOver);
+    autoButton.addEventListener("click", () => {
+      on = !on;
+      shown = 0;
+      label();
+      if (on) next(); else clearTimeout(timer);
+    });
+    autoButton.hidden = false;
+    label();
+    new IntersectionObserver((entries) => {
+      seen = entries.some((entry) => entry.isIntersecting);
+      if (seen) next(); else clearTimeout(timer);
+    }, { threshold: 0.5 }).observe(pick("audit-gates"));
+    document.addEventListener("visibilitychange", () => { if (document.hidden) clearTimeout(timer); else next(); });
   }
 }
 
