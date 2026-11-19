@@ -536,3 +536,85 @@ if (!reduce.matches) {
   }
   arrive();
 }
+
+const storyFig = document.querySelector(".story-fig");
+if (storyFig) {
+  const gatesInStory = [...storyFig.querySelectorAll(".sg")];
+  const dot = storyFig.querySelector(".sg-dot");
+  const stepsInStory = [...document.querySelectorAll(".story-step")];
+  const show = (n) => {
+    gatesInStory.forEach((g, i) => g.classList.toggle("on", i <= n));
+    stepsInStory.forEach((s, i) => s.classList.toggle("active", i === n));
+    const target = Math.min(n, 5);
+    dot.setAttribute("transform", "translate(" + (target * 74) + " 0)");
+    storyFig.classList.toggle("done", n >= 6);
+    const src = pick("sg-src");
+    if (src && stepsInStory[n]) {
+      src.classList.remove("in");
+      void src.offsetWidth;
+      src.textContent = stepsInStory[n].dataset.src;
+      src.classList.add("in");
+    }
+    gatesInStory.forEach((g, i) => g.classList.toggle("now", i === n));
+  };
+  if (reduce.matches || !("IntersectionObserver" in window)) {
+    show(6);
+    stepsInStory.forEach((s) => s.classList.add("active"));
+  } else {
+    show(-1);
+    const watch = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => { if (entry.isIntersecting) show(Number(entry.target.dataset.step)); });
+    }, { rootMargin: "-45% 0px -45% 0px" });
+    stepsInStory.forEach((s) => watch.observe(s));
+  }
+}
+
+const buildGrid = pick("build-grid");
+if (buildGrid) {
+  const COLS = 12, ROWS = 7, cells = [];
+  for (let i = 0; i < COLS * ROWS; i += 1) { const c = document.createElement("span"); buildGrid.append(c); cells.push(c); }
+  const finalFrame = () => {
+    cells.forEach((c, i) => c.className = (i % 5 && i % 7) ? "on" : "");
+    cells[COLS * 3 + 7].className = "on bad caught";
+  };
+  if (reduce.matches || !canWatch) {
+    finalFrame();
+  } else {
+    let timer = 0, visible = false;
+    const run = () => {
+      cells.forEach((c) => (c.className = ""));
+      buildGrid.classList.remove("sweep");
+      const filled = new Set();
+      let at = COLS * 3 + Math.floor(COLS / 2);
+      const order = [];
+      while (order.length < 52) {
+        if (!filled.has(at)) { filled.add(at); order.push(at); }
+        const r = Math.floor(at / COLS), c = at % COLS;
+        const moves = [[0, 1], [0, -1], [1, 0], [-1, 0]].map(([dr, dc]) => [r + dr, c + dc]).filter(([y, x]) => y >= 0 && y < ROWS && x >= 0 && x < COLS);
+        const [y, x] = moves[Math.floor(Math.random() * moves.length)];
+        at = y * COLS + x;
+      }
+      const bad = order[18 + Math.floor(Math.random() * 25)];
+      let k = 0;
+      const step = () => {
+        if (!visible) return;
+        if (k < order.length) {
+          const cell = cells[order[k]];
+          cell.className = order[k] === bad ? "on bad" : "on";
+          k += 1;
+          timer = setTimeout(step, 55);
+        } else {
+          buildGrid.style.setProperty("--catch", ((bad % COLS) + 0.5) / COLS);
+          buildGrid.classList.add("sweep");
+          timer = setTimeout(() => { cells[bad].classList.add("caught"); timer = setTimeout(run, 2600); }, 1300 * (((bad % COLS) + 0.5) / COLS) + 100);
+        }
+      };
+      step();
+    };
+    new IntersectionObserver((entries) => {
+      visible = entries.some((e) => e.isIntersecting);
+      clearTimeout(timer);
+      if (visible) run();
+    }, { threshold: 0.3 }).observe(buildGrid);
+  }
+}
