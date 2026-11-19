@@ -9,7 +9,7 @@ export function start(hero, onReady) {
   const canvas = renderer.domElement;
   canvas.className = "net3d";
   canvas.setAttribute("aria-hidden", "true");
-  hero.prepend(canvas);
+  document.body.prepend(canvas);
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(52, 1, 0.1, 100);
@@ -74,23 +74,22 @@ export function start(hero, onReady) {
   scene.add(cloud);
 
   const resize = () => {
-    const box = hero.getBoundingClientRect();
+    const box = { width: window.innerWidth, height: window.innerHeight };
     renderer.setSize(box.width, box.height, false);
-    canvas.style.width = box.width + "px";
-    canvas.style.height = box.height + "px";
     camera.aspect = box.width / Math.max(1, box.height);
     camera.updateProjectionMatrix();
   };
   resize();
 
   let aimX = 0, aimY = 0, tiltX = 0, tiltY = 0, frame = 0, running = false;
+  const calm = new THREE.Color(0x174e3d);
+  const glow = new THREE.Color(0xff963c);
+  const green = new THREE.Color(0x174e3d);
   const began = performance.now();
-  hero.addEventListener("pointermove", (event) => {
-    const box = hero.getBoundingClientRect();
-    aimX = ((event.clientX - box.left) / box.width - 0.5) * 0.5;
-    aimY = ((event.clientY - box.top) / box.height - 0.5) * 0.3;
-  });
-  hero.addEventListener("pointerleave", () => { aimX = 0; aimY = 0; });
+  window.addEventListener("pointermove", (event) => {
+    aimX = (event.clientX / window.innerWidth - 0.5) * 0.5;
+    aimY = (event.clientY / window.innerHeight - 0.5) * 0.3;
+  }, { passive: true });
   const render = (now) => {
     const t = (now - began) / 1000;
     tiltX += (aimY - tiltX) * 0.05;
@@ -98,17 +97,21 @@ export function start(hero, onReady) {
     cloud.rotation.y = t * 0.045 + tiltY;
     cloud.rotation.x = Math.sin(t * 0.12) * 0.08 + tiltX;
     const scrolled = Math.min(1, window.scrollY / Math.max(1, hero.offsetHeight));
-    camera.position.z = 9 + scrolled * 3;
+    const shift = window.storyShift || 0;
+    camera.position.z = 9 + scrolled * 3 - shift * 4.5;
+    green.lerpColors(calm, glow, shift);
+    pointMaterial.color.copy(green);
+    pointMaterial.opacity = 0.48 + shift * 0.4;
+    canvas.style.opacity = String(Math.max(1 - scrolled * 0.7, shift * 0.95).toFixed(3));
     renderer.render(scene, camera);
     frame = requestAnimationFrame(render);
   };
   const play = () => { if (!running) { running = true; frame = requestAnimationFrame(render); } };
   const pause = () => { running = false; cancelAnimationFrame(frame); };
-  new IntersectionObserver((entries) => (entries[0].isIntersecting ? play() : pause())).observe(hero);
   document.addEventListener("visibilitychange", () => (document.hidden ? pause() : play()));
   let timer = 0;
   window.addEventListener("resize", () => { clearTimeout(timer); timer = setTimeout(resize, 150); });
   renderer.render(scene, camera);
   play();
-  requestAnimationFrame(() => { canvas.classList.add("on"); onReady(); });
+  requestAnimationFrame(() => { canvas.style.opacity = "1"; onReady(); });
 }

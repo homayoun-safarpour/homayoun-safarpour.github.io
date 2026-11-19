@@ -247,7 +247,7 @@ if (canWatch && !reduce.matches) {
       countUp(entry.target);
     });
   }, { threshold: 0.6 });
-  document.querySelectorAll(".count[data-to]").forEach((node) => countWatch.observe(node));
+  document.querySelectorAll(".num[data-to]").forEach((node) => countWatch.observe(node));
 
   const sections = [...document.querySelectorAll("main > section:not(.hero)")];
   const sectionWatch = new IntersectionObserver((entries) => {
@@ -407,4 +407,71 @@ if (!reduce.matches && window.matchMedia("(hover: hover) and (pointer: fine)").m
   tilt(".demo", 3);
   tilt(".twin figure", 6);
   tilt(".facts article", 5);
+}
+
+const twinCard = pick("twin");
+if (twinCard) {
+  const word = pick("world");
+  const FROM = "REAL";
+  const TO = "VIRTUAL";
+  const mix = (a, b, t) => Math.round(a + (b - a) * t);
+  const story = () => {
+    const box = twinCard.getBoundingClientRect();
+    const high = window.innerHeight;
+    const away = Math.abs(box.top + box.height / 2 - high / 2);
+    let shift = 1 - Math.min(1, Math.max(0, (away - high * 0.15) / (high * 0.9)));
+    shift = shift * shift * (3 - 2 * shift);
+    window.storyShift = shift;
+    twinCard.classList.toggle("virtual", shift > 0.55);
+    twinCard.style.setProperty("--lit", shift.toFixed(3));
+    if (reduce.matches) return;
+    document.body.style.backgroundColor = "rgb(" + mix(248, 236, shift) + "," + mix(247, 226, shift) + "," + mix(242, 208, shift) + ")";
+    const top = box.top + window.scrollY - high / 2;
+    const part = Math.min(1, Math.max(0, window.scrollY / Math.max(1, top)));
+    const letters = Math.round(part * TO.length);
+    word.textContent = TO.slice(0, letters) + FROM.slice(letters);
+    word.classList.toggle("virtual", shift > 0.55);
+  };
+  window.addEventListener("scroll", story, { passive: true });
+  window.addEventListener("resize", story);
+  story();
+}
+
+if (!reduce.matches) {
+  let waiting = [];
+  const mark = (selector, step) => {
+    document.querySelectorAll(selector).forEach((el, index) => {
+      if (el.getBoundingClientRect().top < window.innerHeight * 0.9) return;
+      el.classList.add("rise");
+      el.style.setProperty("--i", String(step ? index % 3 : 0));
+      waiting.push(el);
+    });
+  };
+  mark(".hook", false);
+  mark(".audit-report", false);
+  mark(".grid article", true);
+  mark(".steps details", true);
+  mark(".twin figure", false);
+  const arrive = () => {
+    if (!waiting.length) return;
+    const line = window.innerHeight * 0.88;
+    waiting = waiting.filter((el) => {
+      if (el.getBoundingClientRect().top > line) return true;
+      el.classList.add("in");
+      return false;
+    });
+    if (!waiting.length) window.removeEventListener("scroll", arrive);
+  };
+  window.addEventListener("scroll", arrive, { passive: true });
+  window.addEventListener("resize", arrive);
+  const soon = () => setTimeout(arrive, 60);
+  document.addEventListener("click", soon);
+  document.addEventListener("input", soon);
+  document.addEventListener("keyup", soon);
+  document.addEventListener("visibilitychange", arrive);
+  if (canWatch) {
+    const net = new IntersectionObserver(arrive, { threshold: 0.05 });
+    waiting.forEach((el) => net.observe(el));
+  }
+  arrive();
 }
