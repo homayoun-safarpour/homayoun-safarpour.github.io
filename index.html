@@ -22,6 +22,7 @@
 <script defer src="demo-data.js"></script>
 <script defer src="audit-data.js"></script>
 <script defer src="site.js"></script>
+<script type="module" src="explorer.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -42,29 +43,18 @@
       <p class="who">Trustworthy AI PhD researcher at the University of Limerick, in the <a href="https://www.ul.ie/business/kbs-research/research-clusters/ai-era-research-group">AI-ERA research group</a>, based in the <a href="https://www.aixlab.ie/">XTREME Living Lab</a>. I evaluate and test AI agents, and build open-source tools that check what they did.</p>
       <p class="links"><a href="https://scholar.google.com/citations?user=0MimZZEAAAAJ&amp;hl=en">Google Scholar <span aria-hidden="true">↗</span></a><a href="https://www.linkedin.com/in/homayoun-safarpour">LinkedIn <span aria-hidden="true">↗</span></a><a href="https://github.com/homayoun-safarpour">GitHub <span aria-hidden="true">↗</span></a></p>
     </div>
-    <section class="demo" id="demo" aria-labelledby="demo-title">
-      <header class="demo-header"><div><p class="mono">INTERACTIVE DEMO</p><h2 id="demo-title">Trace gate</h2></div><span class="demo-dot" aria-hidden="true"></span></header>
-      <fieldset id="case-options" class="cases" hidden>
-        <legend>Choose a recorded example</legend>
-        <label><input type="radio" name="demo-case" value="0" checked><span>Clean</span></label>
-        <label><input type="radio" name="demo-case" value="1"><span>Forbidden call</span></label>
-        <label><input type="radio" name="demo-case" value="2"><span>Unknown case</span></label>
-      </fieldset>
-      <div class="trace-display" aria-live="polite" aria-atomic="true">
-        <p id="trace-label" class="trace-label">Tool calls</p>
-        <ol class="trace" id="trace" aria-labelledby="trace-label"><li><code>read</code><span>Allowed call</span></li></ol>
-        <div class="scoreline"><span id="score-label">Composite score</span><strong id="score">1.0000</strong></div>
-        <div class="meter" aria-hidden="true"><div id="score-fill"></div><i id="score-floor"></i></div>
-        <p id="floor" class="floor">Baseline floor 0.9500</p>
-        <div id="verdict-strip" class="verdict good"><strong id="verdict">PASS</strong><span id="exit">exit 0</span></div>
-        <p id="explanation" class="explanation">The known trace clears the baseline and has no forbidden calls.</p>
+    <section class="demo explorer" id="explore" aria-labelledby="explore-title">
+      <header class="demo-header"><div><p class="mono">INTERACTIVE · FRAMEWORK</p><h2 id="explore-title">Eight controls, one run</h2></div><span class="demo-dot" aria-hidden="true"></span></header>
+      <div class="x-stage" id="x-stage" aria-hidden="true"></div>
+      <div class="x-buttons" role="group" aria-label="Choose a control"><button type="button" class="xb xb-partial" data-i="0" aria-pressed="true"><span>1</span> Scope and permissions</button><button type="button" class="xb xb-covered" data-i="1" aria-pressed="false"><span>2</span> Behaviour evidence</button><button type="button" class="xb xb-covered" data-i="2" aria-pressed="false"><span>3</span> Records and traceability</button><button type="button" class="xb xb-partial" data-i="3" aria-pressed="false"><span>4</span> Human oversight and hand-over</button><button type="button" class="xb xb-partial" data-i="4" aria-pressed="false"><span>5</span> Evaluation validity and judges</button><button type="button" class="xb xb-partial" data-i="5" aria-pressed="false"><span>6</span> Adversarial testing</button><button type="button" class="xb xb-gap" data-i="6" aria-pressed="false"><span>7</span> Monitoring after deployment</button><button type="button" class="xb xb-partial" data-i="7" aria-pressed="false"><span>8</span> Accountability and governance</button></div>
+      <div class="x-panel" id="x-panel" aria-live="polite">
+        <p class="x-head"><span class="x-n">1</span> <strong class="x-name">Scope and permissions</strong> <span class="x-status x-partial">partial</span></p>
+        <p class="x-q">May the agent do this, with these arguments, after what it has already done?</p>
+        <p class="x-line"><span>Our check</span> <span class="x-ours">Gate 2: every call replayed through Microsoft&#x27;s policy engine, default deny. Tool names only; not arguments or call order yet.</span></p>
+        <p class="x-line"><span>Evidence</span> <span class="x-count">9 verified findings</span></p>
+        <p class="x-line"><span>Related to</span> <span class="x-related">OWASP Agentic Top 10: ASI02 tool misuse. EU AI Act Art. 9. NIST AI RMF MANAGE.</span></p>
       </div>
-      <details id="cli-evidence" class="cli-evidence" hidden>
-        <summary>Recorded CLI output</summary>
-        <ul id="cli-output"></ul>
-      </details>
-      <p class="demo-foot">Results replay saved synthetic CLI runs from the draft 0.2.0 revision. The rows and explanations summarise each example. <a href="https://github.com/homayoun-safarpour/trace-gate/blob/ef2e69ba1dd0536140d480f4b2a229af91b33dcc/docs/gate-proof.json">Source and results ↗</a></p>
-      <noscript><p class="demo-foot">The clean replay is shown. Enable JavaScript to explore the other examples.</p></noscript>
+      <p class="demo-foot">Pillar height: verified findings behind each control. Colour: covered, partial or gap. <a href="framework.html">The full framework and its 90 sources ↗</a></p>
     </section>
   </section>
 
@@ -78,7 +68,34 @@
     </div>
   </section>
 
-<section class="audit wrap" id="audit" aria-labelledby="audit-title">
+<section class="wrap demo-move" aria-label="Trace gate demo">
+      <section class="demo" id="demo" aria-labelledby="demo-title">
+        <header class="demo-header"><div><p class="mono">INTERACTIVE DEMO</p><h2 id="demo-title">Trace gate</h2></div><span class="demo-dot" aria-hidden="true"></span></header>
+        <fieldset id="case-options" class="cases" hidden>
+          <legend>Choose a recorded example</legend>
+          <label><input type="radio" name="demo-case" value="0" checked><span>Clean</span></label>
+          <label><input type="radio" name="demo-case" value="1"><span>Forbidden call</span></label>
+          <label><input type="radio" name="demo-case" value="2"><span>Unknown case</span></label>
+        </fieldset>
+        <div class="trace-display" aria-live="polite" aria-atomic="true">
+          <p id="trace-label" class="trace-label">Tool calls</p>
+          <ol class="trace" id="trace" aria-labelledby="trace-label"><li><code>read</code><span>Allowed call</span></li></ol>
+          <div class="scoreline"><span id="score-label">Composite score</span><strong id="score">1.0000</strong></div>
+          <div class="meter" aria-hidden="true"><div id="score-fill"></div><i id="score-floor"></i></div>
+          <p id="floor" class="floor">Baseline floor 0.9500</p>
+          <div id="verdict-strip" class="verdict good"><strong id="verdict">PASS</strong><span id="exit">exit 0</span></div>
+          <p id="explanation" class="explanation">The known trace clears the baseline and has no forbidden calls.</p>
+        </div>
+        <details id="cli-evidence" class="cli-evidence" hidden>
+          <summary>Recorded CLI output</summary>
+          <ul id="cli-output"></ul>
+        </details>
+        <p class="demo-foot">Results replay saved synthetic CLI runs from the draft 0.2.0 revision. The rows and explanations summarise each example. <a href="https://github.com/homayoun-safarpour/trace-gate/blob/ef2e69ba1dd0536140d480f4b2a229af91b33dcc/docs/gate-proof.json">Source and results ↗</a></p>
+        <noscript><p class="demo-foot">The clean replay is shown. Enable JavaScript to explore the other examples.</p></noscript>
+      </section>
+  </section>
+
+  <section class="audit wrap" id="audit" aria-labelledby="audit-title">
     <p class="eyebrow"><span class="rule" aria-hidden="true"></span> One method</p>
     <div class="build-grid" id="build-grid" aria-hidden="true"></div>
     <h2 id="audit-title">Audit one run, end to end.</h2>
