@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Open-source tools for evaluating AI agents, measuring judge reliability and building reproducible systems.">
+<meta name="color-scheme" content="light">
+<title>Homayoun Safarpour | Trustworthy AI tools</title>
+<link rel="canonical" href="https://homayoun-safarpour.github.io/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Homayoun Safarpour | Trustworthy AI tools">
+<meta property="og:description" content="Replay a Trace Gate check and explore open-source tools for evaluating AI agents, measuring judge reliability and building reproducible systems.">
+<meta property="og:url" content="https://homayoun-safarpour.github.io/">
+<link rel="stylesheet" href="style.css">
+<script defer src="demo-data.js"></script>
+<script defer src="audit-data.js"></script>
+<script defer src="site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="mast wrap">
+  <a class="brand" href="#main"><span class="mark" aria-hidden="true">H<span>.</span></span><span>Homayoun Safarpour</span></a>
+  <nav aria-label="Main navigation"><a href="#demo">Demo</a><a href="#audit">Audit</a><a href="#research">Research</a><a href="#projects">Projects</a><a class="github" href="https://github.com/homayoun-safarpour">GitHub <span aria-hidden="true">↗</span></a></nav>
+</header>
+<main id="main">
+  <section class="hero wrap" aria-labelledby="intro">
+    <div class="intro">
+      <p class="eyebrow"><span class="rule" aria-hidden="true"></span> Trustworthy AI · Open source</p>
+      <h1 id="intro">Can you trust what<br class="desktop"> your agent <em>did?</em></h1>
+      <p class="lede">I’m a PhD researcher building tools to check how AI agents behave, how consistently their judges score, and whether a result can be reproduced.</p>
+      <div class="actions"><a class="primary" href="#demo">Replay a trace check <span aria-hidden="true">↓</span></a><a class="secondary" href="#projects">Explore the repositories <span aria-hidden="true">↓</span></a></div>
+      <p class="who">PhD researcher in Computer Science, University of Szeged. Visiting researcher at the University of Limerick, in Lero and the XTREME Living Lab.</p>
+      <p class="links"><a href="https://scholar.google.com/citations?user=0MimZZEAAAAJ&amp;hl=en">Google Scholar <span aria-hidden="true">↗</span></a><a href="https://www.linkedin.com/in/homayoun-safarpour">LinkedIn <span aria-hidden="true">↗</span></a><a href="https://github.com/homayoun-safarpour">GitHub <span aria-hidden="true">↗</span></a></p>
+    </div>
+    <section class="demo" id="demo" aria-labelledby="demo-title">
+      <header class="demo-header"><div><p class="mono">INTERACTIVE DEMO</p><h2 id="demo-title">Trace gate</h2></div><span class="demo-dot" aria-hidden="true"></span></header>
+      <fieldset id="case-options" class="cases" hidden>
+        <legend>Choose a recorded example</legend>
+        <label><input type="radio" name="demo-case" value="0" checked><span>Clean</span></label>
+        <label><input type="radio" name="demo-case" value="1"><span>Forbidden call</span></label>
+        <label><input type="radio" name="demo-case" value="2"><span>Unknown case</span></label>
+      </fieldset>
+      <div class="trace-display" aria-live="polite" aria-atomic="true">
+        <p id="trace-label" class="trace-label">Tool calls</p>
+        <ol class="trace" id="trace" aria-labelledby="trace-label"><li><code>read</code><span>Allowed call</span></li></ol>
+        <div class="scoreline"><span id="score-label">Composite score</span><strong id="score">1.0000</strong></div>
+        <div class="meter" aria-hidden="true"><div id="score-fill"></div><i id="score-floor"></i></div>
+        <p id="floor" class="floor">Baseline floor 0.9500</p>
+        <div id="verdict-strip" class="verdict good"><strong id="verdict">PASS</strong><span id="exit">exit 0</span></div>
+        <p id="explanation" class="explanation">The known trace clears the baseline and has no forbidden calls.</p>
+      </div>
+      <details id="cli-evidence" class="cli-evidence" hidden>
+        <summary>Recorded CLI output</summary>
+        <ul id="cli-output"></ul>
+      </details>
+      <p class="demo-foot">Results replay saved synthetic CLI runs from the draft 0.2.0 revision. The rows and explanations summarise each example. <a href="https://github.com/homayoun-safarpour/trace-gate/blob/ef2e69ba1dd0536140d480f4b2a229af91b33dcc/docs/gate-proof.json">Source and results ↗</a></p>
+      <noscript><p class="demo-foot">The clean replay is shown. Enable JavaScript to explore the other examples.</p></noscript>
+    </section>
+  </section>
+
+  <section class="audit wrap" id="audit" aria-labelledby="audit-title">
+    <p class="eyebrow"><span class="rule" aria-hidden="true"></span> One method</p>
+    <h2 id="audit-title">Audit one run, end to end.</h2>
+    <p class="section-note">A clean trace is not enough. Break something below and watch which gate catches it.</p>
+    <fieldset id="audit-options" class="faults" hidden>
+      <legend>Break something</legend>
+      <label class="switch"><input type="checkbox" id="fault-refund"><span class="switch-track" aria-hidden="true"></span><span>The agent also calls <code>refund_all</code></span></label>
+      <label class="switch"><input type="checkbox" id="fault-judges"><span class="switch-track" aria-hidden="true"></span><span>The judges disagree</span></label>
+      <label class="switch"><input type="checkbox" id="fault-handoff"><span class="switch-track" aria-hidden="true"></span><span>Nobody kept the hand-over record</span></label>
+      <button type="button" id="audit-replay" class="replay">Replay <span aria-hidden="true">↻</span></button>
+    </fieldset>
+    <div class="audit-report">
+      <svg class="gates" id="audit-gates" viewBox="0 0 1000 330" role="img" aria-labelledby="gates-title" data-start="87.2,259.8" data-end="912.8,152.2">
+        <title id="gates-title">One recorded run passing six gates in turn. The list below gives each verdict in text.</title>
+        <polygon class="road" points="40,245 900,133 960,167 100,279"/>
+        <line class="road-line" x1="70" y1="262" x2="930" y2="150"/>
+        <g class="gate pass" data-x="192.9" data-y="246.0"><polygon class="gate-fill" points="162.9,229.0 162.9,125.0 222.9,159.0 222.9,263.0"/><path class="gate-frame" d="M162.9 229.0 L162.9 125.0 L222.9 159.0 L222.9 263.0"/><text class="gate-label" x="192.9" y="113.0" text-anchor="middle">1 behaviour</text><text class="gate-word" x="228.9" y="293.0" text-anchor="middle">PASS</text></g><g class="gate pass" data-x="315.7" data-y="230.0"><polygon class="gate-fill" points="285.7,213.0 285.7,109.0 345.7,143.0 345.7,247.0"/><path class="gate-frame" d="M285.7 213.0 L285.7 109.0 L345.7 143.0 L345.7 247.0"/><text class="gate-label" x="315.7" y="97.0" text-anchor="middle">2 policy</text><text class="gate-word" x="351.7" y="277.0" text-anchor="middle">PASS</text></g><g class="gate pass" data-x="438.6" data-y="214.0"><polygon class="gate-fill" points="408.6,197.0 408.6,93.0 468.6,127.0 468.6,231.0"/><path class="gate-frame" d="M408.6 197.0 L408.6 93.0 L468.6 127.0 L468.6 231.0"/><text class="gate-label" x="438.6" y="81.0" text-anchor="middle">3 completion</text><text class="gate-word" x="474.6" y="261.0" text-anchor="middle">PASS</text></g><g class="gate pass" data-x="561.4" data-y="198.0"><polygon class="gate-fill" points="531.4,181.0 531.4,77.0 591.4,111.0 591.4,215.0"/><path class="gate-frame" d="M531.4 181.0 L531.4 77.0 L591.4 111.0 L591.4 215.0"/><text class="gate-label" x="561.4" y="65.0" text-anchor="middle">4 hand-over</text><text class="gate-word" x="597.4" y="245.0" text-anchor="middle">PASS</text></g><g class="gate pass" data-x="684.3" data-y="182.0"><polygon class="gate-fill" points="654.3,165.0 654.3,61.0 714.3,95.0 714.3,199.0"/><path class="gate-frame" d="M654.3 165.0 L654.3 61.0 L714.3 95.0 L714.3 199.0"/><text class="gate-label" x="684.3" y="49.0" text-anchor="middle">5 judge</text><text class="gate-word" x="720.3" y="229.0" text-anchor="middle">PASS</text></g><g class="gate pass" data-x="807.1" data-y="166.0"><polygon class="gate-fill" points="777.1,149.0 777.1,45.0 837.1,79.0 837.1,183.0"/><path class="gate-frame" d="M777.1 149.0 L777.1 45.0 L837.1 79.0 L837.1 183.0"/><text class="gate-label" x="807.1" y="33.0" text-anchor="middle">6 red team</text><text class="gate-word" x="843.1" y="213.0" text-anchor="middle">PASS</text></g>
+        <g id="audit-token" class="token" transform="translate(912.8 152.2)"><circle r="15" class="token-halo"/><circle r="9" class="token-dot"/></g>
+      </svg>
+      <p id="audit-status" class="audit-status" aria-live="polite">Overall: PASS. Six of six gates passed.</p>
+      <ol id="audit-steps" class="audit-steps">
+        <li><span class="audit-verdict good">PASS</span><div><p class="audit-question">Did the agent do only what it was allowed to, and no worse than the pinned baseline?</p><p class="audit-said"><span class="audit-tool">trace-gate</span> support-agent-good: PASS composite=1.0000 &gt;= floor=0.9500 (pinned=1.0000)</p></div></li><li><span class="audit-verdict good">PASS</span><div><p class="audit-question">Would a governance policy engine have allowed every recorded tool call?</p><p class="audit-said"><span class="audit-tool">agt-policy-replay</span> policy replay: 2 of 2 calls allowed, 0 denied</p></div></li><li><span class="audit-verdict good">PASS</span><div><p class="audit-question">Did the run really finish, with proof?</p><p class="audit-said"><span class="audit-tool">homi-gate</span> PASS check-completion: completion.json</p></div></li><li><span class="audit-verdict good">PASS</span><div><p class="audit-question">Is there a usable hand-over record?</p><p class="audit-said"><span class="audit-tool">homi-gate</span> PASS check-handoff: handoff.json</p></div></li><li><span class="audit-verdict good">PASS</span><div><p class="audit-question">Do the judges that scored the replies agree enough to be trusted?</p><p class="audit-said"><span class="audit-tool">judgekit</span> Inter-judge Fleiss kappa: 0.856 - almost perfect - check for a leaked cue or a degenerate label distribution</p></div></li><li><span class="audit-verdict good">PASS</span><div><p class="audit-question">Did a red-team scan of the model find failures? <span class="audit-optional">optional</span></p><p class="audit-said"><span class="audit-tool">garak-report</span> garak report: 0 failed of 30 evaluated, in 2 probe and detector pairs</p></div></li>
+      </ol>
+      <div id="audit-overall" class="verdict good"><strong id="audit-overall-word">Overall: PASS</strong><span id="audit-exit">exit 0</span></div>
+    </div>
+    <p class="audit-foot">Each of the 8 combinations replays a saved run of ai-use-audit 0.1.0 on synthetic evidence. Every verdict is the exit code of the named tool. The page computes nothing, and this is not a compliance certificate.</p>
+    <noscript><p class="audit-foot">The clean report is shown. Enable JavaScript to break the run.</p></noscript>
+  </section>
+
+  <section class="research wrap" id="research" aria-labelledby="research-title">
+    <p class="eyebrow"><span class="rule" aria-hidden="true"></span> Research</p>
+    <h2 id="research-title">The research behind the tools.</h2>
+    <div class="facts">
+      <article><p class="figure">25,149</p><h3>paper titles screened</h3><p>Three language models (Mistral 7B, Llama 3.3 70B and GPT-4.1) benchmarked on evidence screening across three software-engineering domains, with expert validation. First author, IEEE SANER Companion 2026.</p><a class="card-extra" href="https://conf.researchr.org/details/saner-2026/saner-2026-workshops-tutorials-track/39/Empirical-Evaluation-of-Open-Source-Large-Language-Models-for-Paper-Selection-Are-LL">The paper at SANER 2026 <span aria-hidden="true">↗</span></a></article>
+      <article><p class="figure">14 <span>organisations</span></p><h3>Horizon Europe XTREME, grant 101136006</h3><p>Visiting researcher in the XTREME Living Lab at Lero, working on the evaluation of mixed-reality prototypes on Apple Vision Pro.</p><a class="card-extra" href="https://cordis.europa.eu/project/id/101136006">The project on CORDIS <span aria-hidden="true">↗</span></a></article>
+      <article><p class="figure">9 <span>publications</span></p><h3>papers and one book chapter, 2024 to 2026</h3><p>Language-model evaluation, explainable medical imaging, reinforcement learning for indoor drones, and language models in clinical applications (CRC Press, 2025). One of the nine is forthcoming. A systematic review on agentic AI bias and governance is under review and is not counted.</p><a class="card-extra" href="https://scholar.google.com/citations?user=0MimZZEAAAAJ&amp;hl=en">Google Scholar <span aria-hidden="true">↗</span></a></article>
+    </div>
+  </section>
+
+  <section class="work wrap" id="projects" aria-labelledby="projects-title">
+    <p class="eyebrow"><span class="rule" aria-hidden="true"></span> Project library</p>
+    <h2 id="projects-title">Pick the problem you’re solving.</h2>
+    <div id="project-filters" class="filters" hidden>
+      <div class="chips" role="group" aria-label="Filter projects">
+        <button type="button" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" data-filter="agents" aria-pressed="false">Agent behaviour</button>
+        <button type="button" data-filter="judges" aria-pressed="false">Judge reliability</button>
+        <button type="button" data-filter="engineering" aria-pressed="false">Reproducibility</button>
+      </div>
+      <label class="search" for="search"><span>Find a project</span><input id="search" type="search" placeholder="e.g. baseline" autocomplete="off"></label>
+    </div>
+    <p class="count" id="project-count" aria-live="polite">12 projects</p>
+    <div class="grid">
+      <article data-topic="agents" class="featured"><span class="card-label">Agent behaviour</span><h3><a href="https://github.com/homayoun-safarpour/trace-gate">trace-gate <span aria-hidden="true">↗</span></a></h3><p>Check recorded tool calls against a reviewed policy and a pinned regression baseline.</p><a class="card-extra" href="#demo">Try the example ↓</a></article>
+      <article data-topic="agents"><span class="card-label">Agent behaviour</span><h3><a href="https://github.com/homayoun-safarpour/homi-gate">homi-gate <span aria-hidden="true">↗</span></a></h3><p>Check agent run completion, handoff records and declared MCP tool access before a workflow continues.</p></article>
+      <article data-topic="judges"><span class="card-label">Judge reliability</span><h3><a href="https://github.com/homayoun-safarpour/judge-drift-sentinel">judge-drift-sentinel <span aria-hidden="true">↗</span></a></h3><p>Check whether judge agreement on frozen, human-labelled examples has shifted.</p></article>
+      <article data-topic="judges"><span class="card-label">Judge reliability</span><h3><a href="https://github.com/homayoun-safarpour/judge-reliability-kit">judge-reliability-kit <span aria-hidden="true">↗</span></a></h3><p>Measure agreement within and between judges using repeated ratings.</p></article>
+      <article data-topic="agents"><span class="card-label">Agent behaviour</span><h3><a href="https://github.com/homayoun-safarpour/agent-loop-engine">agent-loop-engine <span aria-hidden="true">↗</span></a></h3><p>Use gate results and a backlog to choose one next action in a bounded loop.</p></article>
+      <article data-topic="agents"><span class="card-label">Agent behaviour</span><h3><a href="https://github.com/homayoun-safarpour/agent-loop-field-guide">agent-loop-field-guide <span aria-hidden="true">↗</span></a></h3><p>Define completion, checks and stopping conditions before automating a workflow.</p></article>
+      <article data-topic="engineering"><span class="card-label">Reproducibility</span><h3><a href="https://github.com/homayoun-safarpour/rag-eval-service">rag-eval-service <span aria-hidden="true">↗</span></a></h3><p>Exercise a retrieval pipeline and measure ranking with frozen hit@k and MRR examples.</p></article>
+      <article data-topic="agents"><span class="card-label">Agent behaviour</span><h3><a href="https://github.com/homayoun-safarpour/agent-eval-workbench">agent-eval-workbench <span aria-hidden="true">↗</span></a></h3><p>Run deterministic scenarios and inspect recorded failures in agent traces.</p></article>
+      <article data-topic="engineering"><span class="card-label">Reproducibility</span><h3><a href="https://github.com/homayoun-safarpour/repro-ml-pipeline">repro-ml-pipeline <span aria-hidden="true">↗</span></a></h3><p>Trace an example ML workflow from training and registration to serving.</p></article>
+      <article data-topic="engineering"><span class="card-label">Reproducibility</span><h3><a href="https://github.com/homayoun-safarpour/ai-eng-skill-range">ai-eng-skill-range <span aria-hidden="true">↗</span></a></h3><p>Practise AI engineering with small exercises and grading criteria.</p></article>
+      <article data-topic="agents"><span class="card-label">Agent behaviour</span><h3><a href="https://github.com/homayoun-safarpour/agent-constraint-auditor">agent-constraint-auditor <span aria-hidden="true">↗</span></a></h3><p>Audit agent transcripts against their declared constraints.</p></article>
+      <article data-topic="judges"><span class="card-label">Judge reliability</span><h3><a href="https://github.com/homayoun-safarpour/judge-field-guide">judge-field-guide <span aria-hidden="true">↗</span></a></h3><p>Find evaluation and judge tools in a curated, link-checked guide.</p></article>
+    </div>
+    <p class="empty" id="empty" hidden>No projects match. Try a different filter or <button type="button" id="clear">show all projects</button>.</p>
+  </section>
+
+  <section class="workflow" aria-labelledby="workflow-title"><div class="wrap workflow-layout">
+    <div><p class="eyebrow"><span class="rule" aria-hidden="true"></span> Method</p><h2 id="workflow-title">How the tools fit together.</h2><p class="section-note">Follow one change from a recorded run to a check another person can repeat.</p></div>
+    <div class="steps">
+      <details open><summary><span class="step">01</span> Record what happened</summary><p>Capture a run and retain its tool calls. Start with reproducible scenarios in the <a href="https://github.com/homayoun-safarpour/agent-eval-workbench">agent-eval-workbench</a>.</p></details>
+      <details><summary><span class="step">02</span> Compare against a known baseline</summary><p>Run <a href="https://github.com/homayoun-safarpour/trace-gate">trace-gate</a> on the matching policy and baseline. Keep the verdict and the evidence that produced it.</p></details>
+      <details><summary><span class="step">03</span> Check the judge</summary><p>Use the <a href="https://github.com/homayoun-safarpour/judge-reliability-kit">judge-reliability-kit</a> to inspect agreement and the <a href="https://github.com/homayoun-safarpour/judge-drift-sentinel">drift sentinel</a> to monitor frozen examples.</p></details>
+      <details><summary><span class="step">04</span> Decide what to do next</summary><p>Use the <a href="https://github.com/homayoun-safarpour/agent-loop-field-guide">agent-loop-field-guide</a> to record the next action, the check and when to stop.</p></details>
+    </div>
+  </div></section>
+</main>
+<footer class="wrap footer"><span>Homayoun Safarpour</span><a href="https://github.com/homayoun-safarpour">Explore on GitHub ↗</a></footer>
+</body>
+</html>
