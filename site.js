@@ -2,6 +2,8 @@
 
 const demo = window.TRACE_GATE_DEMO;
 const pick = (id) => document.getElementById(id);
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+const canWatch = "IntersectionObserver" in window;
 const narratives = [
   { calls: [["read", "Allowed call"]], text: "The known trace clears the baseline and has no forbidden calls." },
   { calls: [["read", "Allowed call"], ["deny_0", "Forbidden call"]], text: "The score clears the floor, but the second call violates policy. The check fails." },
@@ -51,6 +53,18 @@ if (demo) {
     input.addEventListener("change", () => showCase(Number(input.value)));
   });
   showCase(Number(document.querySelector('input[name="demo-case"]:checked').value));
+  if (!reduce.matches) {
+    const fill = pick("score-fill");
+    const target = fill.style.width;
+    fill.style.transition = "none";
+    fill.style.width = "0%";
+    pick("verdict-strip").classList.add("arrive");
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      fill.style.transition = "width .9s ease-out";
+      fill.style.width = target;
+      setTimeout(() => { fill.style.transition = ""; }, 1000);
+    }));
+  }
   pick("case-options").hidden = false;
   pick("cli-evidence").hidden = false;
 } else {
@@ -62,8 +76,11 @@ const buttons = [...document.querySelectorAll("[data-filter]")];
 const search = pick("search");
 let topic = "all";
 
-function filterProjects() {
+function filterProjects(animate) {
   const words = search.value.trim().toLowerCase().split(/\s+/u).filter(Boolean);
+  const move = animate === true && !reduce.matches && typeof document.body.animate === "function";
+  const before = new Map();
+  if (move) cards.forEach((card) => { if (!card.hidden) before.set(card, card.getBoundingClientRect()); });
   let visible = 0;
   for (const card of cards) {
     const text = card.textContent.toLowerCase();
@@ -72,6 +89,19 @@ function filterProjects() {
     card.hidden = !matches;
     if (matches) visible += 1;
   }
+  if (move) {
+    cards.forEach((card) => {
+      if (card.hidden) return;
+      const now = card.getBoundingClientRect();
+      const was = before.get(card);
+      if (!was) {
+        card.animate([{ opacity: 0, transform: "scale(.97)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "ease-out" });
+      } else if (was.left !== now.left || was.top !== now.top) {
+        card.animate([{ transform: "translate(" + (was.left - now.left) + "px," + (was.top - now.top) + "px)" }, { transform: "none" }],
+          { duration: 260, easing: "ease-out" });
+      }
+    });
+  }
   pick("project-count").textContent = visible + (visible === 1 ? " project" : " projects");
   pick("empty").hidden = visible !== 0;
 }
@@ -79,11 +109,11 @@ function filterProjects() {
 function selectTopic(value) {
   topic = value;
   buttons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.filter === value)));
-  filterProjects();
+  filterProjects(true);
 }
 
 buttons.forEach((button) => button.addEventListener("click", () => selectTopic(button.dataset.filter)));
-search.addEventListener("input", filterProjects);
+search.addEventListener("input", () => filterProjects(true));
 pick("clear").addEventListener("click", () => {
   search.value = "";
   selectTopic("all");
@@ -124,7 +154,7 @@ function auditItem(step) {
   return item;
 }
 
-function showAudit(animate) {
+function showAudit(animate, quiet) {
   const key = ["fault-refund", "fault-judges", "fault-handoff"].map((id) => (pick(id).checked ? "1" : "0")).join("");
   const run = audit.combinations[key];
   if (!run) return;
@@ -167,7 +197,7 @@ function showAudit(animate) {
   pick("audit-overall").className = "verdict unknown";
   pick("audit-overall-word").textContent = "Running the gates";
   pick("audit-exit").textContent = "";
-  pick("audit-status").textContent = "Running the gates.";
+  if (!quiet) pick("audit-status").textContent = "Running the gates.";
   token.classList.add("jump");
   place(svg.dataset.start);
   auditTimers.push(setTimeout(() => token.classList.remove("jump"), 60));
@@ -184,4 +214,52 @@ if (audit) {
   pick("audit-replay").addEventListener("click", () => showAudit(true));
   pick("audit-options").hidden = false;
   showAudit(false);
+  if (canWatch && !reduce.matches) {
+    let played = false;
+    const stopFirstPlay = () => { played = true; };
+    ["fault-refund", "fault-judges", "fault-handoff", "audit-replay"].forEach((id) => pick(id).addEventListener("click", stopFirstPlay));
+    const gateWatch = new IntersectionObserver((entries) => {
+      if (played || !entries.some((entry) => entry.isIntersecting)) return;
+      played = true;
+      gateWatch.disconnect();
+      showAudit(true, true);
+    }, { threshold: 0.6 });
+    gateWatch.observe(pick("audit-gates"));
+  }
+}
+
+if (canWatch && !reduce.matches) {
+  const countUp = (node) => {
+    const target = Number(node.dataset.to);
+    const began = performance.now();
+    const step = (now) => {
+      const part = Math.min(1, (now - began) / 900);
+      const eased = 1 - Math.pow(1 - part, 3);
+      node.textContent = Math.round(target * eased).toLocaleString("en-GB");
+      if (part < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+  const countWatch = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      countWatch.unobserve(entry.target);
+      countUp(entry.target);
+    });
+  }, { threshold: 0.6 });
+  document.querySelectorAll(".count[data-to]").forEach((node) => countWatch.observe(node));
+
+  const sections = [...document.querySelectorAll("main > section:not(.hero)")];
+  const sectionWatch = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      sectionWatch.unobserve(entry.target);
+      entry.target.classList.add("in");
+    });
+  }, { threshold: 0.06 });
+  sections.forEach((section) => {
+    if (section.getBoundingClientRect().top < window.innerHeight * 0.9) return;   // already on screen: leave it alone
+    section.classList.add("reveal");
+    sectionWatch.observe(section);
+  });
 }

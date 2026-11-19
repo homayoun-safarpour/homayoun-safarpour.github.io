@@ -115,7 +115,7 @@ h1 em{color:var(--green);font-weight:400}
 .facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem}
 .facts article{padding:1.14rem 1.18rem;background:var(--card);border:1px solid var(--hair);border-radius:7px}
 .figure{font-family:var(--serif);font-size:clamp(2.2rem,3.6vw,3.1rem);line-height:1;letter-spacing:-.03em;color:var(--green);margin:0 0 .45rem}
-.figure span{font-family:var(--mono);font-size:.8rem;letter-spacing:.04em;color:var(--muted)}
+.figure .unit{font-family:var(--mono);font-size:.8rem;letter-spacing:.04em;color:var(--muted)}.count{font-variant-numeric:tabular-nums}
 .facts h3{font-size:1rem;line-height:1.3;margin:0 0 .45rem}
 .facts p:not(.figure){font-size:.89rem;color:var(--muted);margin:0}
 @media(max-width:770px){.facts{grid-template-columns:1fr}}
@@ -163,4 +163,9 @@ h1 em{color:var(--green);font-weight:400}
 @media(max-width:1050px){.desktop{display:none}.hero{gap:4%;padding-block:66px}.grid article{min-height:10rem}}
 @media(max-width:770px){.wrap{width:calc(100% - 36px)}.hero,.workflow-layout{grid-template-columns:1fr;gap:1.4rem}.hero{padding-block:48px 52px}.work{padding-block:42px 52px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mast nav{gap:.7rem}.workflow-layout{padding-block:46px}}
 @media(max-width:475px){.mast{min-height:66px}.brand,.mast nav{gap:.45rem}.brand{font-size:.81rem}.mark{width:31px;height:31px;font-size:1.2rem}.mast nav{font-size:.75rem}.github{padding:.3rem .42rem}.grid{grid-template-columns:1fr}.grid article{min-height:0}.demo{padding:1rem}.search{width:100%}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important}}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease-out,transform .55s ease-out}
+.reveal.in{opacity:1;transform:none}
+@media print{.reveal{opacity:1;transform:none}}
+.verdict.arrive{animation:arrive .45s ease-out .75s both}
+@keyframes arrive{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}.reveal{opacity:1;transform:none}}
