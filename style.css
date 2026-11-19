@@ -119,6 +119,21 @@ h1 em{color:var(--green);font-weight:400}
 .facts h3{font-size:1rem;line-height:1.3;margin:0 0 .45rem}
 .facts p:not(.figure){font-size:.89rem;color:var(--muted);margin:0}
 @media(max-width:770px){.facts{grid-template-columns:1fr}}
+.twin{margin-top:.7rem;padding:1.14rem 1.18rem;background:var(--card);border:1px solid var(--hair);border-radius:7px}
+.twin-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:1.6rem;align-items:center;margin-bottom:1.2rem}
+.twin figure{margin:0;position:relative}
+.twin img{display:block;width:100%;height:auto;border-radius:5px}
+.twin figcaption{position:absolute;left:.5rem;bottom:.5rem;background:var(--dark);color:#eff9f2;font:600 .72rem var(--mono);letter-spacing:.05em;padding:.25rem .55rem;border-radius:4px}
+.twin-tag{font-family:var(--mono);font-size:.76rem;letter-spacing:.07em;text-transform:uppercase;color:var(--green);font-weight:700;margin:0 0 .5rem}
+.twin h3{font-family:var(--serif);font-weight:400;font-size:clamp(1.6rem,2.6vw,2.2rem);letter-spacing:-.03em;line-height:1.1;margin:0 0 .6rem}
+.twin-intro,.twin-contact{font-size:.92rem;color:var(--muted);margin:0 0 .8rem}
+.twin-contact{margin:0}
+.twin-contact a{color:var(--green);font-weight:650}
+.twin-lists{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem 1.8rem}
+.twin h4{font-size:.86rem;margin:0 0 .3rem}
+.twin ul{margin:0;padding-left:1.1rem;font-size:.87rem;color:var(--muted)}
+.twin li+li{margin-top:.2rem}
+@media(max-width:770px){.twin-top{grid-template-columns:1fr;gap:1rem}.twin-lists{grid-template-columns:1fr}}
 .work{border-top:1px solid var(--hair);padding-block:61px 80px}
 .work h2,.workflow h2{font-size:clamp(2.4rem,4.4vw,4rem);margin-bottom:1.35rem}
 .filters{display:flex;align-items:end;justify-content:space-between;gap:.65rem 1rem;flex-wrap:wrap}
