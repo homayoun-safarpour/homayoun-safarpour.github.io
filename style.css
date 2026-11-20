@@ -315,6 +315,32 @@ h1 em{color:var(--green);font-weight:400}
 .explorer .demo-foot a{color:#bce6c9}
 .demo-move{padding-block:10px 50px;max-width:46rem}
 @media(max-width:640px){.x-buttons{grid-template-columns:1fr 1fr}.x-line{grid-template-columns:1fr;gap:0}}
+.story-stage{height:230px;border-radius:5px;overflow:hidden}.story-stage canvas{display:block;width:100%;height:100%}
+.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.floaty{background:var(--card);border:1px solid var(--hair);border-radius:9px;box-shadow:0 34px 44px -22px #17211e3d,0 2px 6px #17211e12}
+.story-fig{box-shadow:0 34px 44px -22px #17211e3d,0 2px 6px #17211e12}
+@keyframes bob{0%,100%{translate:0 0}50%{translate:0 -7px}}
+@media(prefers-reduced-motion:no-preference){.floaty,.story-fig,.explorer{animation:bob 7s ease-in-out infinite}.kmap{animation-delay:-2s}.eu-flow-wrap{animation-delay:-4s}}
+.eu-flow-wrap{padding:.8rem 1rem;margin:.4rem 0 .6rem}
+.eu-flow{display:block;width:100%;height:auto}
+.ef-req{cursor:pointer;outline:none}.ef-req text{font:600 13.5px system-ui,sans-serif;fill:var(--ink);transition:fill .2s}
+.ef-req.gap text{fill:var(--muted);font-style:italic}
+.ef-req:focus-visible text,.ef-req.on text{fill:var(--green);text-decoration:underline}
+.ef-paths path{fill:none;stroke:#174e3d;stroke-width:2.2;stroke-linecap:round;opacity:.22;stroke-dasharray:1;stroke-dashoffset:0;transition:opacity .25s}
+.ef-paths.gap path{stroke:#7d877f;stroke-dasharray:.06 .05}.ef-open{fill:none;stroke:#7d877f;stroke-width:2}
+.eu-flow.picked .ef-paths path{opacity:.07}
+.eu-flow .ef-paths.on path{opacity:1;stroke-width:3;animation:efdraw .6s var(--ease-out)}
+@keyframes efdraw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.ef-gate circle{fill:var(--card);stroke:#aeb6ae;stroke-width:2.5;transition:fill .25s,stroke .25s}
+.ef-num{font:700 14px var(--mono);fill:var(--muted)}.ef-name{font:600 13px system-ui,sans-serif;fill:var(--muted)}
+.ef-gate.on circle{fill:var(--green);stroke:var(--green)}.ef-gate.on .ef-num{fill:#fff}.ef-gate.on .ef-name{fill:var(--ink)}
+.ef-note{font-size:.8rem;color:var(--muted);margin:.3rem 0 0;min-height:2.4em}
+.kmap{padding:.6rem .8rem;margin:.6rem 0 1rem}.kmap canvas{display:block;width:100%}
+.kmap-tip{font-size:.8rem;color:var(--muted);margin:.2rem 0 0;min-height:1.3em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.audit-3d{position:absolute;right:0;top:44px;width:min(360px,34%);height:150px;overflow:hidden}
+.audit-3d canvas{display:block;width:100%;height:100%}
+.audit.has3d .build-grid{display:none}
+@media(max-width:640px){.ef-req text{font-size:12px}}
 .work{border-top:1px solid var(--hair);padding-block:61px 80px}
 .work h2,.workflow h2{font-size:clamp(2.4rem,4.4vw,4rem);margin-bottom:1.35rem}
 .filters{display:flex;align-items:end;justify-content:space-between;gap:.65rem 1rem;flex-wrap:wrap}

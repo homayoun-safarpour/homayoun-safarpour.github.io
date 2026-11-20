@@ -58,10 +58,12 @@ if (stage && webgl && !reduce && window.innerWidth > 640) {
     world.add(run);
     const halo = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.58, 48), new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.9 }));
     halo.rotation.x = -Math.PI / 2; world.add(halo);
+    let target = 0;
     onSelect = (i) => {
       const p = pillars[i];
       halo.position.set(p.position.x, 0.02, p.position.z);
       pillars.forEach((q, k) => q.scale.setScalar(k === i ? 1.14 : 1));
+      if (userTook) { const a = (i / DATA.length) * Math.PI * 2; target = -a + Math.round((target + a) / (Math.PI * 2)) * Math.PI * 2; }
     };
     onSelect(selected);
     const size = () => {
@@ -69,7 +71,8 @@ if (stage && webgl && !reduce && window.innerWidth > 640) {
       renderer.setSize(w, h, false); camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix();
     };
     size(); window.addEventListener("resize", size);
-    let drag = null, spin = 0, target = 0;
+    let drag = null, spin = 0, lastY = window.scrollY;
+    window.addEventListener("scroll", () => { const y = window.scrollY; if (!userTook) target += (y - lastY) * 0.003; lastY = y; }, { passive: true });
     stage.addEventListener("pointerdown", (ev) => { drag = { x: ev.clientX, s: target }; stage.setPointerCapture(ev.pointerId); });
     stage.addEventListener("pointermove", (ev) => { if (drag) { target = drag.s + (ev.clientX - drag.x) * 0.008; userTook = true; } });
     stage.addEventListener("pointerup", (ev) => {
@@ -90,7 +93,8 @@ if (stage && webgl && !reduce && window.innerWidth > 640) {
       if (now - last < 32) return;
       last = now;
       const t = (now - t0) / 1000;
-      if (!drag) target += 0.0025;
+      if (!drag && !userTook) target += 0.0025;
+      pillars.forEach((q, k) => { const y = q.userData.h / 2 + (k === selected ? 0.32 : 0); q.position.y += (y - q.position.y) * 0.12; });
       spin += (target - spin) * 0.08;
       world.rotation.y = spin;
       const lap = (t % 12) / 12, a = lap * Math.PI * 2;
