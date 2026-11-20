@@ -419,3 +419,23 @@ main section>p:not(.eyebrow):not(.count),.story-step>p,.hero .intro>p,.twin-intr
 .verdict.arrive{animation:arrive .45s var(--ease-out) .75s both}
 @keyframes arrive{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}.reveal{opacity:1;transform:none}}
+/* 20 Nov 2026 phone fix (his iPhone recording): the page must never be wider than the screen */
+html,body{overflow-x:clip}
+.sr-only{padding:0;margin:-1px;border:0;clip:rect(0 0 0 0);max-width:1px}
+table.sr-only{display:block}
+@media(max-width:600px){
+.mast{flex-wrap:wrap;row-gap:.2rem;padding-block:.5rem}
+.mast nav{width:100%;overflow-x:auto;white-space:nowrap;scrollbar-width:none;gap:1rem;padding-bottom:.25rem;-webkit-overflow-scrolling:touch}
+.mast nav::-webkit-scrollbar{display:none}
+}
+@media(max-width:900px){
+.story-fig{background:var(--paper);border-bottom:1px solid var(--hair);box-shadow:0 10px 14px -12px #17211e40;animation:none;padding:.3rem 0}
+.story-stage{height:190px}
+.sg-def{min-height:0;font-size:.85rem}
+.story-step{transform:none}
+.audit-report.rise{transform:translateY(16px)}
+.audit-report.rise.in{transform:none}
+.eu-flow-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;animation:none}
+.eu-flow{min-width:620px}
+.ef-note{position:sticky;left:0}
+}
