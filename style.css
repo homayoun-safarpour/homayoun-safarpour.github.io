@@ -479,3 +479,39 @@ table.sr-only{display:block}
 .footer{flex-wrap:wrap;gap:.4rem 1rem}
 }
 .sc-out .sc-first{font-weight:700;color:#9a4d10}
+
+/* 20 Nov 2026: Where each check sits (V2 rings, his pick) */
+.layers{padding-block:56px 40px;border-top:1px solid var(--hair)}
+.ly-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2.4rem;align-items:center;margin-top:1.2rem}
+.ly-fig{margin:0}.ly-fig figcaption{font-size:.8rem;color:var(--muted);text-align:center;margin-top:.4rem}
+.ly-svg{display:block;width:100%;max-width:520px;margin:0 auto;height:auto}
+.ly-band{fill:#e3efe6;stroke:#f8f7f2;stroke-width:3;cursor:pointer;transition:fill .25s}
+.ly-ring:nth-child(odd) .ly-band{fill:#d5e8db}
+.ly-ring:hover .ly-band,.ly-ring:focus .ly-band{fill:#c4dfcd}
+.ly-ring.on .ly-band{fill:#bce6c9}
+.ly-ring:focus{outline:none}
+.ly-gov-ring{fill:none;stroke:var(--green);stroke-width:2;stroke-dasharray:7 6;cursor:pointer}
+.ly-gov-tick{stroke:var(--green);stroke-width:1.6;stroke-dasharray:3 4;opacity:.7}
+.ly-gov-end{fill:#d4a73c}
+.gov-on .ly-gov-ring{stroke:#d9781f;stroke-width:3}.gov-on .ly-gov-tick{stroke:#d9781f;opacity:1}
+.ly-num-bg{fill:var(--green)}.ly-num{fill:#fff;font:700 12px Consolas,monospace;text-anchor:middle;pointer-events:none}
+.ly-dot{fill:#174e3d99;stroke:#f8f7f2;stroke-width:2;pointer-events:none;transition:r .2s,fill .2s}
+.ly-dot.on{fill:#d9781f;r:8}
+.ly-core{font:400 18px Georgia,serif;fill:var(--ink);text-anchor:middle;pointer-events:none}
+.ly-list{list-style:none;margin:0;padding:0;display:grid;gap:.35rem}
+.ly-item{position:relative;padding:.55rem .8rem .55rem 2.6rem;border:1px solid transparent;border-radius:7px;cursor:pointer;transition:background .2s,border-color .2s}
+.ly-item:hover{background:var(--card)}
+.ly-item.on{background:var(--card);border-color:var(--hair);box-shadow:0 14px 22px -18px #17211e55}
+.ly-n{position:absolute;left:.7rem;top:.62rem;width:1.35rem;height:1.35rem;border-radius:50%;background:var(--green);color:#fff;font:700 .72rem/1.35rem Consolas,monospace;text-align:center}
+.ly-n-gov{background:#d4a73c}
+.ly-item b{display:block;font-size:1rem}
+.ly-item p{margin:.1rem 0 0;color:var(--muted);font-size:.88rem}
+.ly-item .ly-tools{display:none;flex-wrap:wrap;gap:.35rem;margin-top:.45rem}
+.ly-item.on .ly-tools{display:flex}
+.ly-tools a,.ly-tools span{font:600 .76rem Consolas,monospace;background:#e3efe6;color:var(--green);padding:.2rem .5rem;border-radius:4px;text-decoration:none}
+.ly-tools a:hover{background:#bce6c9}
+.ly-practice{font-size:.85rem;color:var(--muted);margin-top:1.2rem}
+.ly-practice a{font-family:Consolas,monospace;color:var(--green)}
+@media(max-width:900px){.ly-body{grid-template-columns:1fr;gap:1rem}.ly-svg{max-width:360px}}
+.layers h2{font-family:var(--serif);font-weight:400;letter-spacing:-.043em;line-height:1.02;font-size:clamp(2.4rem,4.4vw,4rem);margin:.2rem 0 .8rem}
+.ly-gov-tick,.ly-gov-end{pointer-events:none}
