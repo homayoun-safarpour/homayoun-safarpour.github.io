@@ -426,7 +426,7 @@ if (net && net.getContext) {
     try { const test = document.createElement("canvas"); return !!(test.getContext("webgl2") || test.getContext("webgl")); }
     catch (error) { return false; }
   })();
-  if (webgl && !reduce.matches && window.innerWidth > 640) {
+  if (webgl && !reduce.matches && window.innerWidth >= 320) {
     const later = window.requestIdleCallback || ((fn) => setTimeout(fn, 600));
     window.addEventListener("load", () => later(() => {
       import("./net3d.js").then((mod) => mod.start(hero, () => {

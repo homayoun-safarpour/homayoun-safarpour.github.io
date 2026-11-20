@@ -29,7 +29,7 @@ buttons.forEach((b, i) => b.addEventListener("click", () => { userTook = true; s
 const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const stage = document.getElementById("x-stage");
 const webgl = (() => { try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); } catch (e) { return false; } })();
-if (stage && webgl && !reduce && window.innerWidth > 640) {
+if (stage && webgl && !reduce && window.innerWidth >= 320) {
   import("./vendor/three.module.min.js").then((THREE) => {
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "low-power" });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));

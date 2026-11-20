@@ -439,3 +439,5 @@ table.sr-only{display:block}
 .eu-flow{min-width:620px}
 .ef-note{position:sticky;left:0}
 }
+/* 20 Nov 2026: the 3D network and the 3D pillars run on phones too (they ran by accident while the page was too wide) */
+@media(max-width:640px){.explorer .x-stage.on{height:300px;margin:0 -4% .4rem}}

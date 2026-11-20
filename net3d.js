@@ -1,5 +1,5 @@
 // 3D point network behind the first screen. Loaded only after the page has drawn, only where WebGL works,
-// only on screens wider than 640 px, and never when the visitor asks for reduced motion.
+// only on screens at least 320 px wide (phones included since 20 Nov 2026), and never when the visitor asks for reduced motion.
 // Library: three.js r165 (MIT), vendored in vendor/ so nothing is fetched from another site.
 import * as THREE from "./vendor/three.module.min.js";
 
