@@ -20,7 +20,7 @@ const show = (i) => {
   panel.querySelector(".x-ours").textContent = d.ours + " " + d.note;
   panel.querySelector(".x-count").textContent = d.count + " verified findings";
   panel.querySelector(".x-related").textContent = d.related;
-  findList.replaceChildren(...FINDS[i].map((f) => { const li = document.createElement("li"); const a = document.createElement("a"); a.href = f.u; a.textContent = f.p + " \u2197"; li.append(f.t + " ", a); return li; }));
+  findList.replaceChildren(...FINDS[i].map((f) => { const li = document.createElement("li"); const a = document.createElement("a"); a.href = f.u; a.textContent = f.p + "\u00a0\u2197"; li.append(f.t + " ", a); return li; }));
   buttons.forEach((b, k) => b.setAttribute("aria-pressed", String(k === i)));
   onSelect(i);
 };
@@ -35,6 +35,9 @@ if (stage && webgl && !reduce && window.innerWidth >= 320) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     stage.append(renderer.domElement);
     stage.classList.add("on");
+    const key = document.createElement("p"); key.className = "x-key";
+    key.innerHTML = '<span class="k k-covered"></span>covered <span class="k k-partial"></span>partial <span class="k k-gap"></span>gap';
+    stage.after(key);
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
     camera.position.set(0, 7.4, 9.6);
@@ -47,13 +50,13 @@ if (stage && webgl && !reduce && window.innerWidth >= 320) {
     const ring = new THREE.Mesh(new THREE.RingGeometry(R - 0.06, R + 0.06, 96), new THREE.MeshBasicMaterial({ color: 0x5f7a6c, side: THREE.DoubleSide, transparent: true, opacity: 0.55 }));
     ring.rotation.x = -Math.PI / 2; world.add(ring);
     const tagFor = (n, text) => {
-      const c = document.createElement("canvas"); c.width = 384; c.height = 96;
+      const c = document.createElement("canvas"); c.width = 480; c.height = 96;
       const g = c.getContext("2d");
       g.fillStyle = "#174e3d"; g.beginPath(); g.arc(48, 48, 34, 0, Math.PI * 2); g.fill();
       g.fillStyle = "#fff"; g.font = "700 40px Consolas, monospace"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(String(n), 48, 51);
       g.fillStyle = "#17211e"; g.font = "600 34px system-ui, sans-serif"; g.textAlign = "left"; g.fillText(text, 94, 50);
       const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthTest: false }));
-      sp.scale.set(2.2, 0.55, 1);
+      sp.scale.set(2.75, 0.55, 1); sp.renderOrder = 20;
       return sp;
     };
     const plateGeo = new THREE.BoxGeometry(0.66, 0.06, 0.66);
@@ -70,21 +73,22 @@ if (stage && webgl && !reduce && window.innerWidth >= 320) {
         if (gap) plate.add(new THREE.LineSegments(new THREE.EdgesGeometry(plateGeo), new THREE.LineBasicMaterial({ color: 0x7d877f })));
         stack.add(plate); plates.push(plate);
       }
-      const label = tagFor(d.n, SHORT[i]);
+      const label = tagFor(d.n, SHORT[i] + " \u00b7 " + d.count);
       stack.add(label);
       stack.position.set(Math.sin(a) * R, 0, Math.cos(a) * R);
-      stack.userData = { i, plates, label, spread: 0 };
+      stack.userData = { i, plates, label, spread: 0, height: 0.68 * Math.sqrt(d.count / 8) };
       world.add(stack); pillars.push(stack);
     });
     const centre = document.createElement("canvas"); centre.width = 512; centre.height = 256;
     const centreTex = new THREE.CanvasTexture(centre);
     const centreSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: centreTex, transparent: true, depthTest: false }));
-    centreSprite.scale.set(3.4, 1.7, 1); centreSprite.position.set(0, 0.9, 0); centreSprite.renderOrder = 10; world.add(centreSprite);
+    centreSprite.scale.set(3.0, 1.5, 1); centreSprite.position.set(0, 0.45, 0); centreSprite.renderOrder = 10; world.add(centreSprite);
     let shownCount = -1;
     const writeCentre = (n) => {
       if (n === shownCount) return;
       shownCount = n;
       const g = centre.getContext("2d"); g.clearRect(0, 0, 512, 256);
+      g.fillStyle = "rgba(248,247,242,0.86)"; g.beginPath(); g.roundRect(56, 22, 400, 206, 26); g.fill();
       g.textAlign = "center"; g.fillStyle = "#174e3d"; g.font = "400 96px Georgia, serif"; g.fillText(n + " of 8", 256, 110);
       g.fillStyle = "#17211e"; g.font = "600 30px system-ui, sans-serif"; g.fillText("controls checked on this run", 256, 160);
       g.fillStyle = "#4d5954"; g.font = "500 24px system-ui, sans-serif"; g.fillText("83 verified findings behind them", 256, 200);
@@ -134,10 +138,10 @@ if (stage && webgl && !reduce && window.innerWidth >= 320) {
       pillars.forEach((q, k) => {
         const u = q.userData;
         u.spread += ((k === selected ? 1 : 0) - u.spread) * 0.12;
-        const step = 0.085 + u.spread * 0.03;
+        const step = u.height / u.plates.length + u.spread * 0.03;
         u.plates.forEach((pl, n) => { pl.position.y = 0.04 + n * step; pl.rotation.y = u.spread * n * 0.12; });
         u.label.position.y = 0.04 + u.plates.length * step + 0.42;
-        u.label.material.opacity = 1 - u.spread;
+        u.label.material.opacity = 1 - u.spread * 0.5;
       });
       writeCentre(DATA.slice(0, Math.min(8, Math.floor(lap0 * 8 + 0.5))).filter((d) => d.status !== "gap").length);
       spin += (target - spin) * 0.08;
