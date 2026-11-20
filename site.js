@@ -566,6 +566,10 @@ if (storyFig) {
       entries.forEach((entry) => { if (entry.isIntersecting) show(Number(entry.target.dataset.step)); });
     }, { rootMargin: "-45% 0px -45% 0px" });
     stepsInStory.forEach((s) => watch.observe(s));
+    stepsInStory.forEach((s) => s.addEventListener("click", (ev) => {
+      if (s.classList.contains("story-audit") || ev.target.closest("a,button,input,summary,label,details")) return;
+      show(Number(s.dataset.step));
+    }));
   }
 }
 
