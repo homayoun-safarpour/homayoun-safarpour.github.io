@@ -618,3 +618,10 @@ if (buildGrid) {
     }, { threshold: 0.3 }).observe(buildGrid);
   }
 }
+
+const stepDemo = document.getElementById("step-demo");
+if (stepDemo) {
+  const openDemo = () => { stepDemo.open = true; };
+  document.querySelectorAll('a[href="#demo"]').forEach((a) => a.addEventListener("click", openDemo));
+  if (location.hash === "#demo") openDemo();
+}
