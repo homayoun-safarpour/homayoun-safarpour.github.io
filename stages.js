@@ -69,12 +69,19 @@ const el = (name, attrs = {}, text) => {
   wrap.append(svg, note);
   table.before(wrap);
   table.classList.add("sr-only");
+  // One pass through the requirements when the chart first comes into view, then it waits for the visitor.
   if (!reduce && "IntersectionObserver" in window) {
     let i = 0, timer = 0, touched = false;
-    ["pointerenter", "focusin", "click"].forEach((ev) => wrap.addEventListener(ev, () => { touched = true; clearInterval(timer); }));
+    const stopTour = () => { clearInterval(timer); timer = 0; };
+    ["pointerenter", "focusin", "click"].forEach((ev) => wrap.addEventListener(ev, () => { touched = true; stopTour(); }));
     new IntersectionObserver((en) => {
-      clearInterval(timer);
-      if (en[0].isIntersecting && !touched) timer = setInterval(() => { pick(i % rows.length); i += 1; }, 2200);
+      stopTour();
+      if (en[0].isIntersecting && !touched && i < rows.length) {
+        timer = setInterval(() => {
+          if (i >= rows.length) { stopTour(); pick(-1); return; }
+          pick(i); i += 1;
+        }, 2200);
+      }
     }, { threshold: 0.5 }).observe(wrap);
   }
 })();
@@ -128,7 +135,7 @@ const el = (name, attrs = {}, text) => {
       const c = place(h);
       ctx.fillStyle = "#174e3d"; ctx.beginPath(); ctx.arc(c.x, c.y, 15, 0, 7); ctx.fill();
       ctx.fillStyle = "#fff"; ctx.font = "700 11px Consolas, monospace"; ctx.textAlign = "center"; ctx.fillText(String(h.dots.length), c.x, c.y + 4);
-      ctx.fillStyle = "#4d5954"; ctx.font = "600 11px system-ui, sans-serif"; ctx.fillText(h.label.replace(/^Gate [\d ]+/, "").split(":")[0], c.x, c.y + (W < 640 ? 96 : 104));
+      ctx.fillStyle = "#4d5954"; ctx.font = "600 11px system-ui, sans-serif"; ctx.fillText(h.label.replace(/^Gates? \d+(?: and \d+)? /, "").split(":")[0], c.x, c.y + (W < 640 ? 96 : 104));
       h.dots.forEach((d) => {
         const p = pos(h, d), on = hover === d;
         ctx.fillStyle = on ? "#d9781f" : "#174e3d99"; ctx.beginPath(); ctx.arc(p.x, p.y, on ? 6 : 3.4, 0, 7); ctx.fill();

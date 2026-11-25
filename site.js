@@ -251,10 +251,10 @@ if (audit) {
     const autoButton = pick("audit-auto");
     const status = pick("audit-status");
     const tour = ["00000", "10000", "01000", "00100", "00010", "00001"];
-    const MOST = tour.length * 3;
-    let on = true, seen = false, timer = 0, at = 0, shown = 0;
+    const MOST = tour.length;   // one pass, and only after the visitor presses Play
+    let on = false, seen = false, timer = 0, at = 0, shown = 0;
     const label = () => {
-      autoButton.textContent = "Auto demo: " + (on ? "on" : "off");
+      autoButton.textContent = on ? "Stop the tour" : "Play the tour";
       autoButton.setAttribute("aria-pressed", String(on));
       status.setAttribute("aria-live", on ? "off" : "polite");
     };
@@ -276,6 +276,7 @@ if (audit) {
     autoButton.addEventListener("click", () => {
       on = !on;
       shown = 0;
+      if (on) seen = true;
       label();
       if (on) next(); else clearTimeout(timer);
     });
@@ -628,4 +629,38 @@ if (stepDemo) {
   const openDemo = () => { stepDemo.open = true; };
   document.querySelectorAll('a[href="#demo"]').forEach((a) => a.addEventListener("click", openDemo));
   if (location.hash === "#demo") openDemo();
+}
+
+const copyButton = pick("cmd-copy");
+if (copyButton) {
+  const said = pick("cmd-copied");
+  let reset = 0;
+  const done = (ok) => {
+    copyButton.textContent = ok ? "Copied" : "Select and copy";
+    copyButton.classList.toggle("copied", ok);
+    if (said) said.textContent = ok ? "Command copied" : "Copy failed; select the command and copy it";
+    clearTimeout(reset);
+    reset = setTimeout(() => { copyButton.textContent = "Copy"; copyButton.classList.remove("copied"); if (said) said.textContent = ""; }, 2000);
+  };
+  const fallback = (text) => {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.append(area);
+    area.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (error) { ok = false; }
+    area.remove();
+    return ok;
+  };
+  copyButton.addEventListener("click", () => {
+    const text = copyButton.dataset.copy;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(() => done(true), () => done(fallback(text)));
+    } else {
+      done(fallback(text));
+    }
+  });
 }

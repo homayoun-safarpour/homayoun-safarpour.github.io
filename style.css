@@ -515,3 +515,31 @@ table.sr-only{display:block}
 @media(max-width:900px){.ly-body{grid-template-columns:1fr;gap:1rem}.ly-svg{max-width:360px}}
 .layers h2{font-family:var(--serif);font-weight:400;letter-spacing:-.043em;line-height:1.02;font-size:clamp(2.4rem,4.4vw,4rem);margin:.2rem 0 .8rem}
 .ly-gov-tick,.ly-gov-end{pointer-events:none}
+/* 25 Nov 2026 UI consistency: one size for section titles; no list or card text under 12.5 px */
+#how-title,#sources-title{font-size:clamp(2.4rem,4.4vw,4rem);margin-bottom:.8rem}
+.gc-more dt,.ctl dt,.gc-tool,.run-head,.run-head span,.x-line>span:first-child,.trace-display .floor,.twin figcaption{font-size:.78rem}
+/* 25 Nov 2026 first screen: one command with its real output, a proof strip, pointers to the framework page */
+.intro{min-width:0}
+.cmd{margin:1.4rem 0 0;max-width:35rem;background:var(--dark);color:#e8efe9;border-radius:8px;overflow:hidden;font:.8rem/1.5 var(--mono)}
+.cmd-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.4rem .5rem .4rem .9rem;background:var(--panel);color:#b9c7bf;font-size:.78rem}
+.cmd-copy{font:700 .8rem var(--mono);color:var(--dark);background:var(--mint);border:0;border-radius:4px;padding:.42rem .8rem;min-width:5.5rem;cursor:pointer}
+.cmd-copy:hover{background:#d3f0dc}
+.cmd-copy:focus-visible{outline:2px solid var(--warm);outline-offset:2px}
+.cmd-copy.copied{background:var(--warm)}
+.cmd pre{margin:0;padding:.7rem .9rem;white-space:pre-wrap;overflow-wrap:break-word;font:inherit}
+.cmd-in{color:#fff}
+.cmd-prompt{color:var(--mint)}
+.cmd .nw{white-space:nowrap}
+.cmd-out{padding-top:0!important;color:#cfdcd4}
+.cmd figcaption{padding:.55rem .9rem .7rem;border-top:1px solid #2f4a40;color:var(--warm);font:600 .82rem/1.45 system-ui,sans-serif}
+.proof{padding-block:0 30px}
+.proof-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--hair);border:1px solid var(--hair);border-radius:8px;overflow:hidden}
+.proof-list a{display:flex;flex-direction:column;gap:.2rem;height:100%;padding:1rem 1.15rem;background:var(--card);color:var(--ink);text-decoration:none}
+.proof-list a:hover strong,.proof-list a:focus-visible strong{text-decoration:underline}
+.proof-list strong{font:400 clamp(1.5rem,2.4vw,2rem)/1.1 var(--serif);color:var(--green)}
+.proof-list span{font-size:.86rem;color:var(--muted)}
+.pointer{padding-block:24px}
+.fw-words{padding-block:10px 30px}
+@media(max-width:770px){.proof-list{grid-template-columns:1fr}.proof-list a{padding:.8rem 1rem}}
+/* 25 Nov 2026: on phones the link row scrolls sideways; a fade at the right edge shows there is more */
+@media(max-width:600px){.mast nav{-webkit-mask-image:linear-gradient(90deg,#000 86%,transparent);mask-image:linear-gradient(90deg,#000 86%,transparent);padding-right:1.2rem}}

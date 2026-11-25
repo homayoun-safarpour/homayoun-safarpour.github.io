@@ -125,7 +125,7 @@ if (stage && webgl && !reduce && window.innerWidth >= 320) {
       }
       drag = null;
     });
-    let visible = true, last = 0, frame = 0, t0 = performance.now(), lastAuto = performance.now();
+    let visible = true, last = 0, frame = 0, t0 = performance.now(), lastAuto = performance.now(), autoSteps = 0;
     new IntersectionObserver((en) => { visible = en[0].isIntersecting; if (visible) frame = requestAnimationFrame(tick); }).observe(stage);
     function tick(now) {
       if (!visible || document.hidden) return;
@@ -151,7 +151,8 @@ if (stage && webgl && !reduce && window.innerWidth >= 320) {
       const near = Math.round(lap * DATA.length) % DATA.length;
       const gapNow = DATA[near].status === "gap" && Math.abs(lap * DATA.length - Math.round(lap * DATA.length)) < 0.18;
       run.material.emissive.setHex(gapNow ? 0xd9781f : 0x3fae7a);
-      if (!userTook && now - lastAuto > 4500) { lastAuto = now; show((selected + 1) % DATA.length); }
+      // One pass through the eight controls, back to the first, then the panel waits for the visitor.
+      if (!userTook && autoSteps < DATA.length && now - lastAuto > 4500) { lastAuto = now; autoSteps += 1; show((selected + 1) % DATA.length); }
       renderer.render(scene, camera);
     }
     frame = requestAnimationFrame(tick);
