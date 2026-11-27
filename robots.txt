@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://homayoun-safarpour.github.io/sitemap.xml
